@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MyPomodoroApp</string>
+    <string name="txt_btn_start">Start</string>
+    <string name="txt_btn_stop">Stop</string>
+    <string name="txt_btn_twenty_minutes">20 min</string>
+    <string name="txt_btn_fifteen_minutes">15 min</string>
+    <string name="txt_twenty_minutes">20:00</string>
+    <string name="txt_fifteen_minutes">15:00</string>
+</resources>
