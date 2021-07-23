@@ -9,7 +9,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 public class MyChronometer extends AppCompatTextView {
 
-    private MyChronometerTask myChronometerTask;
+    private boolean isRunning = false;
 
     public MyChronometer(@NonNull Context context) {
         super(context);
@@ -23,19 +23,12 @@ public class MyChronometer extends AppCompatTextView {
         super(context, attrs, defStyleAttr);
     }
 
-    public void start() throws RuntimeException {
-        myChronometerTask.execute();
-    }
-
-    public void stop() {
-        myChronometerTask.cancel();
-    }
-
     public boolean isActive() {
-        return myChronometerTask.isRunning();
+        return isRunning;
     }
 
-    public void setMyChronometerTask(MyChronometerTask myChronometerTask) {
-        this.myChronometerTask = myChronometerTask;
+    public void setActive(boolean isRunning) {
+        this.isRunning = isRunning;
     }
+
 }

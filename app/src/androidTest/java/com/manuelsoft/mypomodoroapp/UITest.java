@@ -1,16 +1,15 @@
 package com.manuelsoft.mypomodoroapp;
 
-
-import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -20,35 +19,27 @@ import static androidx.test.espresso.matcher.ViewMatchers.isNotEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
-
+@RunWith(AndroidJUnit4.class)
 @LargeTest
 public class UITest {
+
+    public static final String TAG = UITest.class.getName();
+    private static final String TWENTY_MINUTES = "20:00";
+    private static final String FIFTEEN_MINUTES = "15:00";
 
     @Rule
     public ActivityScenarioRule<MainActivity> activityTestRule =
             new ActivityScenarioRule<>(MainActivity.class);
 
-    public static final String TAG = UITest.class.getName();
-    private Context context;
-    private static final String TWENTY_MINUTES = "20:00";
-    private static final String FIFTEEN_MINUTES = "15:00";
-
-    @Before
-    public void setup() {
-        context = ApplicationProvider.getApplicationContext();
-    }
-
     @Test
     public void clickStartStopBtn_onBtnShowingStartText_showStopText() {
-
         Log.d(TAG, "Checking initial state");
         onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(context.getString(R.string.txt_btn_start))));
+                .check(matches(withText(R.string.txt_btn_start)));
 
         Log.d(TAG, "Clicking btn_start_stop");
         onView(withId(R.id.btn_start_stop)).perform(click())
-                .check(matches(withText(
-                        context.getString(R.string.txt_btn_stop))));
+                .check(matches(withText(R.string.txt_btn_stop)));
 
     }
 
@@ -58,12 +49,11 @@ public class UITest {
 
         Log.d(TAG, "Checking initial state");
         onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(context.getString(R.string.txt_btn_stop))));
+                .check(matches(withText(R.string.txt_btn_stop)));
 
         Log.d(TAG, "Clicking btn_start_stop");
         onView(withId((R.id.btn_start_stop))).perform(click())
-                .check(matches(withText(
-                        context.getString(R.string.txt_btn_start))));
+                .check(matches(withText(R.string.txt_btn_start)));
     }
 
     @Test
@@ -71,7 +61,7 @@ public class UITest {
 
         Log.d(TAG, "Checking initial state");
         onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(context.getString(R.string.txt_btn_start))));
+                .check(matches(withText(R.string.txt_btn_start)));
 
         Log.d(TAG, "Clicking btn_start_stop");
         onView(withId(R.id.btn_start_stop)).perform(click());
@@ -87,7 +77,7 @@ public class UITest {
 
         Log.d(TAG, "Checking initial state");
         onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(context.getString(R.string.txt_btn_stop))));
+                .check(matches(withText(R.string.txt_btn_stop)));
 
         Log.d(TAG, "Clicking btn_start_stop");
         onView(withId(R.id.btn_start_stop)).perform(click());
@@ -149,6 +139,42 @@ public class UITest {
 
         Log.d(TAG, "Checking button state");
         onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
+    }
+
+    @Test
+    public void GivenStatusActiveWithFifteenMinutes_WhenClickStartStopBtn_ThenFifteenMinutesIsShowed() {
+        onView(withId(R.id.btn_fifteen_min)).perform(click());
+        onView(withId(R.id.btn_start_stop)).perform(click());
+
+        Log.d(TAG, "Checking initial state");
+        onView(withId(R.id.chronometer))
+                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+
+        SystemClock.sleep(1000);
+
+        Log.d(TAG,  "Clicking start_stop button");
+        onView(withId(R.id.btn_start_stop)).perform(click());
+
+        Log.d(TAG, "Checking button state");
+        onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
+    }
+
+    @Test
+    public void GivenStatusActiveWithTwentyMinutes_WhenClickStartStopBtn_ThenTwentyMinutesIsShowed() {
+        onView(withId(R.id.btn_twenty_min)).perform(click());
+        onView(withId(R.id.btn_start_stop)).perform(click());
+
+        Log.d(TAG, "Checking initial state");
+        onView(withId(R.id.chronometer))
+                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+
+        SystemClock.sleep(1000);
+
+        Log.d(TAG,  "Clicking start_stop button");
+        onView(withId(R.id.btn_start_stop)).perform(click());
+
+        Log.d(TAG, "Checking button state");
+        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
     }
 
     @Test

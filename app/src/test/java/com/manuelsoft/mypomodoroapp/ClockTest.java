@@ -66,7 +66,7 @@ public class ClockTest {
 
     private class ChronometerTask {
         private int minutes = 20;
-        private Clock clock;
+        private final Clock clock;
 
         ChronometerTask (Clock clock) {
             this.clock = clock;

@@ -22,17 +22,19 @@ public class MyChronometerActiveMatcher {
     static Matcher<View> withIsActive(final Boolean isActive) {
          return withIsActive(is(isActive));
 
-//        return new BoundedMatcher<View, Chronometer>(Chronometer.class) {
-//            @Override
-//            public void describeTo(Description description) {
-//                description.appendText("with isTheFinalCountDown: ");
-//            }
-//
-//            @Override
-//            protected boolean matchesSafely(Chronometer item) {
-//                return item != null && isTheFinalCountDown == item.isTheFinalCountDown();
-//            }
-//        };
+/*
+        return new BoundedMatcher<View, Chronometer>(Chronometer.class) {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("with isTheFinalCountDown: ");
+            }
+
+            @Override
+            protected boolean matchesSafely(Chronometer item) {
+                return item != null && isTheFinalCountDown == item.isTheFinalCountDown();
+            }
+        };
+*/
     }
 
     static Matcher<View> withIsActive(final Matcher<Boolean> booleanMatcher) {

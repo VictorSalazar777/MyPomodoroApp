@@ -2,6 +2,8 @@ package com.manuelsoft.mypomodoroapp;
 
 import android.os.CountDownTimer;
 
+import androidx.annotation.MainThread;
+
 interface MyTask {
     void execute(int minutes, int seconds, long counter);
 }
@@ -25,8 +27,8 @@ public class MyChronometerTask {
     }
 
     public void cancel() {
-        myCountDownTimer.cancel();
         isRunning = false;
+        myCountDownTimer.cancel();
     }
 
     public CountDownTimer execute() {
@@ -82,6 +84,7 @@ public class MyChronometerTask {
         return chronometerString;
     }
 
+   // @MainThread
     public boolean isRunning() {
         return isRunning;
     }
