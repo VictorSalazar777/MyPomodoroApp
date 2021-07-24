@@ -1,6 +1,7 @@
 package com.manuelsoft.mypomodoroapp;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,17 +12,17 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.Toast;
 
+import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.manuelsoft.mypomodoroapp.MyChronometerService.MyChronometerBinder;
 
-import static android.widget.Toast.LENGTH_LONG;
 import static com.manuelsoft.mypomodoroapp.MainActivityPresenter.TWENTY;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.FINISH;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.TICK;
+import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_FINISH;
+import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_TEST;
+import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.MyChronometerService.TIME;
 
 public class MainActivity extends AppCompatActivity {
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection connection;
     private BroadcastReceiver receiver;
     private boolean bound = false;
-
+    private boolean receiverRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         setupStartStopBtn();
         setupFifteenMinutesBtn();
         setupTwentyMinutesBtn();
+        setupTestButton();
     }
 
     private void setupTwentyMinutesBtn() {
@@ -162,19 +164,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
                 switch (intent.getAction()) {
-                    case TICK:
+                    case ACTION_TICK:
                         String time = intent.getStringExtra(TIME);
                         chronometerView.setText(time);
                         break;
-                    case FINISH:
-                        Toast.makeText(MainActivity.this, "Pomodoro finished!", LENGTH_LONG).show();
-                        chronometerView.setActive(false);
-                        startStopBtn.setText(R.string.txt_btn_start);
-                        mainActivityPresenter.setStateInactive();
-                        if (mainActivityPresenter.getHowManyMinutes() == TWENTY) {
-                            fifteenMinutesBtn.setEnabled(true);
-                        } else {
-                            twentyMinutesBtn.setEnabled(true);
+                    case ACTION_FINISH:
+                        showFinishPomodoroDialog();
+                        break;
+                    case ACTION_TEST:
+                        if (BuildConfig.DEBUG) {
+                            Log.d(TAG, "ACTION TEST received");
+                            showFinishPomodoroDialog();
                         }
                         break;
                     default:
@@ -185,14 +185,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerReceiver() {
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(TICK);
-        filter.addAction(FINISH);
-        LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+        if (!receiverRegistered) {
+            receiverRegistered = true;
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ACTION_TICK);
+            filter.addAction(ACTION_FINISH);
+            if (BuildConfig.DEBUG) {
+                filter.addAction(ACTION_TEST);
+            }
+            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
+        }
     }
 
     private void unregisterReceiver() {
-        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+        if (receiverRegistered) {
+            receiverRegistered = false;
+            LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
+        }
     }
 
     @Override
@@ -209,6 +218,28 @@ public class MainActivity extends AppCompatActivity {
         unbindService();
     }
 
+    private void onFinishPomodoro() {
+        chronometerView.setActive(false);
+        startStopBtn.setText(R.string.txt_btn_start);
+        mainActivityPresenter.setStateInactive();
+        if (mainActivityPresenter.getHowManyMinutes() == TWENTY) {
+            fifteenMinutesBtn.setEnabled(true);
+        } else {
+            twentyMinutesBtn.setEnabled(true);
+        }
+    }
+
+    private void showFinishPomodoroDialog() {
+        new AlertDialog.Builder(this)
+                .setMessage(R.string.txt_pomodoro_finished_dialog)
+                .setNeutralButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
+                    dialog.dismiss();
+                    onFinishPomodoro();
+                })
+                .create()
+                .show();
+    }
+
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -217,5 +248,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+    @VisibleForTesting
+    public void setupTestButton() {
+        if (BuildConfig.DEBUG) {
+            Button testBtn = findViewById(R.id.btn_test);
+            testBtn.setOnClickListener(v -> {
+                Log.d(TAG, "Click on button Test");
+                mainActivityPresenter.setStateActive();
+                chronometerView.setActive(true);
+                service.sendOneTick();
+            });
+        }
     }
 }

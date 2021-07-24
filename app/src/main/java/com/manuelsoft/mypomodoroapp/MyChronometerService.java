@@ -6,8 +6,10 @@ import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
@@ -20,8 +22,9 @@ public class MyChronometerService extends Service {
     private final String TAG = MyChronometerService.class.getName();
     public static final String TIME = "time";
     public static final String VENDOR = "com.manuelsoft.mypomodoroapp.";
-    public static final String TICK = VENDOR + "tick";
-    public static final String FINISH = VENDOR + ".finish";
+    public static final String ACTION_TICK = VENDOR + "tick";
+    public static final String ACTION_FINISH = VENDOR + ".finish";
+    public static final String ACTION_TEST = VENDOR + "test";
 
     @Override
     public void onCreate() {
@@ -66,12 +69,12 @@ public class MyChronometerService extends Service {
 
         MyTask myTask = (minutes, seconds, counter) -> {
             String time = myChronometerTask.print(minutes, seconds);
-            sendMessage(TICK, TIME, time);
+            sendMessage(ACTION_TICK, TIME, time);
         };
 
         MyTask end = (minutes, seconds, counter) -> {
             isRunning = false;
-            sendMessage(FINISH, null, null);
+            sendMessage(ACTION_FINISH, null, null);
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
         };
@@ -106,4 +109,23 @@ public class MyChronometerService extends Service {
         return isRunning;
     }
 
+    @VisibleForTesting
+    public void sendOneTick() {
+        new Thread() {
+            @Override
+            public void run() {
+                Log.d(TAG, "Sending ACTION_TEST");
+                sendMessage(ACTION_TEST, null, null);
+            }
+        }.start();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (isRunning) {
+            isRunning = false;
+            chronometerHandler.getLooper().quit();
+        }
+        super.onDestroy();
+    }
 }

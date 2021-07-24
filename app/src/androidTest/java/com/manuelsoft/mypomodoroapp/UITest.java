@@ -13,7 +13,9 @@ import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -249,6 +251,37 @@ public class UITest {
 
         Log.d(TAG,  "Checking if TwentyMinutesBtn is enabled");
         onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
+
+    }
+
+    @Test
+    public void WhenPomodoroTimeIsUp_ThenShowPomodoroFinishDialog() {
+        Log.d(TAG,  "Clicking test button");
+        onView(withId(R.id.btn_test)).perform(click());
+
+        SystemClock.sleep(1000);
+
+        Log.d(TAG,  "Checking if Pomodoro finished dialog is showed");
+        onView(withId(android.R.id.button3)).check(matches(isDisplayed()));
+
+    }
+
+    @Test
+    public void WhenPomodoroFinishedDialogBtnIsClicked_ThenPomodoroTimeIsReestablished() {
+        Log.d(TAG,  "Clicking test button");
+        onView(withId(R.id.btn_test)).perform(click());
+
+        SystemClock.sleep(1000);
+
+        Log.d(TAG,  "Clicking on Pomodoro dialog button");
+        onView(withId(android.R.id.button3)).perform(click());
+
+        Log.d(TAG,  "Checking if Pomodoro finished dialog is gone");
+        onView(withId(android.R.id.button3)).check(doesNotExist());
+
+        Log.d(TAG, "Checking if chronometer state is inactive");
+        onView(withId(R.id.chronometer))
+                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
 
     }
 

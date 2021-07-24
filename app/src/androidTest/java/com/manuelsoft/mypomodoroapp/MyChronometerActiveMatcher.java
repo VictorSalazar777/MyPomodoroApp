@@ -51,8 +51,6 @@ public class MyChronometerActiveMatcher {
 
             @Override
             protected boolean matchesSafely(MyChronometer item) {
-                Log.d(TAG, "HERE HERE HERE:" + item.toString());
-
                 return booleanMatcher.matches(item.isActive());
             }
         };
