@@ -6,7 +6,12 @@ import android.util.Log;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.uiautomator.By;
+import androidx.test.uiautomator.UiDevice;
+import androidx.test.uiautomator.UiSelector;
+import androidx.test.uiautomator.Until;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,11 +20,14 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static org.hamcrest.Matchers.is;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -28,10 +36,16 @@ public class UITest {
     public static final String TAG = UITest.class.getName();
     private static final String TWENTY_MINUTES = "20:00";
     private static final String FIFTEEN_MINUTES = "15:00";
+    private UiDevice uiDevice;
 
     @Rule
     public ActivityScenarioRule<MainActivity> activityTestRule =
             new ActivityScenarioRule<>(MainActivity.class);
+
+    @After
+    public void destroyService() {
+        activityTestRule.getScenario().onActivity(MainActivity::destroyService);
+    }
 
     @Test
     public void clickStartStopBtn_onBtnShowingStartText_showStopText() {
@@ -285,5 +299,24 @@ public class UITest {
 
     }
 
+    @Test
+    public void checkForegroundServiceIcon() {
+        if (BuildConfig.VERSION_CODE >= 18) {
+            uiDevice = UiDevice.getInstance(getInstrumentation());
+            boolean appeared = uiDevice.findObject(new UiSelector().resourceId("R.mipmap.ic_launcher")).exists();
 
+            Log.d(TAG, "Check if notification appeared");
+            assertThat(appeared, is(true));
+        }
+    }
+
+    @Test
+    public void testForegroundServiceNotification() {
+        uiDevice = UiDevice.getInstance(getInstrumentation());
+        boolean open = uiDevice.openNotification();
+        // uiDevice.wait(Until.hasObject(By.pkg("com.android.systemui")), 10000);
+
+        Log.d(TAG, "Check if notification opened");
+        assertThat(open, is(true));
+    }
 }

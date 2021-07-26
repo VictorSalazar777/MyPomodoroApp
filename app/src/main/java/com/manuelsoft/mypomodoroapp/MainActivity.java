@@ -15,6 +15,7 @@ import android.widget.Button;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.manuelsoft.mypomodoroapp.MyChronometerService.MyChronometerBinder;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setupChronometer();
         setupReceiver();
         registerReceiver();
+        startForegroundService();
         setupServiceConnection();
         bindService();
         setupStartStopBtn();
@@ -127,6 +129,16 @@ public class MainActivity extends AppCompatActivity {
         if (bound) {
             service.stopChronometer();
         }
+    }
+
+    private void startForegroundService() {
+        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
+        ContextCompat.startForegroundService(this,intent );
+    }
+
+    private void stopForegroundService() {
+        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
+        stopService(intent);
     }
 
     private void setupServiceConnection() {
@@ -261,5 +273,18 @@ public class MainActivity extends AppCompatActivity {
                 service.sendOneTick();
             });
         }
+    }
+
+    @VisibleForTesting
+    public void destroyService() {
+        stopForegroundService();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (!mainActivityPresenter.isActive()) {
+            stopForegroundService();
+        }
+        super.onDestroy();
     }
 }

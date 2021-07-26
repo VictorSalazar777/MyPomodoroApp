@@ -1,8 +1,11 @@
 package com.manuelsoft.mypomodoroapp;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Build;
 import android.os.IBinder;
 
+import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ServiceTestRule;
@@ -16,6 +19,7 @@ import java.util.concurrent.TimeoutException;
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 @MediumTest
 @RunWith(AndroidJUnit4.class)
@@ -69,6 +73,19 @@ public class MyChronometerServiceTest {
         assertThat(service.chronometerIsActive(), is(false));
     }
 
+    @Test
+    public void startForegroundService() {
+        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
+        ComponentName name;
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            name = getApplicationContext().startForegroundService(intent);
+        } else {
+            name = getApplicationContext().startService(intent);
+        }
+
+        assertThat(name, notNullValue());
+    }
 
 
 }
