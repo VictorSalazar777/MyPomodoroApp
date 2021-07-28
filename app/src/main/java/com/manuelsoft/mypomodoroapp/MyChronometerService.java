@@ -77,7 +77,7 @@ public class MyChronometerService extends Service {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(POMODORO_CHANNEL_ID, name, importance);
             channel.setDescription(description);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -104,7 +104,7 @@ public class MyChronometerService extends Service {
                 0,
                 intent,
                 FLAG_UPDATE_CURRENT
-                );
+        );
     }
 
     public void sendMessage(String action, String name, String message) {
