@@ -16,7 +16,6 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
@@ -37,11 +36,15 @@ public class MyChronometerService extends Service {
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private NotificationCompat.Builder notificationBuilder;
+    private AudioPlayer audioPlayer;
+    private VolumeContentObserver volumeContentObserver;
 
     @Override
     public void onCreate() {
         super.onCreate();
         myChronometerTask = new MyChronometerTask();
+        audioPlayer = new AudioPlayer();
+        audioPlayer.init();
     }
 
     @Nullable
@@ -58,6 +61,15 @@ public class MyChronometerService extends Service {
 //        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 //        notificationManager.notify(NOTIFICATION_SERVICE_ID, notification);
         startForeground(NOTIFICATION_SERVICE_ID, notification);
+        audioPlayer.loadSound(this, R.raw.clock);
+        volumeContentObserver = new VolumeContentObserver(this, null,
+                volume -> audioPlayer.setVolume(volume));
+        getApplicationContext()
+                .getContentResolver()
+                .registerContentObserver(
+                        android.provider.Settings.System.CONTENT_URI,
+                        true,
+                        volumeContentObserver);
         return START_NOT_STICKY;
     }
 
@@ -94,8 +106,6 @@ public class MyChronometerService extends Service {
                 FLAG_UPDATE_CURRENT
                 );
     }
-
-
 
     public void sendMessage(String action, String name, String message) {
         Intent intent = new Intent();
@@ -148,6 +158,7 @@ public class MyChronometerService extends Service {
             Looper.loop();
         });
         thread.start();
+        audioPlayer.play(volumeContentObserver.getCurrentVolume());
     }
 
     public void stopChronometer() {
@@ -155,6 +166,7 @@ public class MyChronometerService extends Service {
         chronometerHandler.post(myChronometerTask::cancel);
         chronometerHandler.getLooper().quit();
         // chronometerHandler.removeCallbacksAndMessages(null);
+        audioPlayer.stop();
     }
 
 
@@ -179,7 +191,11 @@ public class MyChronometerService extends Service {
             isRunning = false;
             chronometerHandler.getLooper().quit();
         }
+        audioPlayer.release();
+        getApplicationContext().getContentResolver().unregisterContentObserver(volumeContentObserver);
         stopForeground(true);
         super.onDestroy();
     }
+
+
 }

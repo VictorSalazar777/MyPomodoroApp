@@ -2,8 +2,6 @@ package com.manuelsoft.mypomodoroapp;
 
 import android.os.CountDownTimer;
 
-import androidx.annotation.MainThread;
-
 interface MyTask {
     void execute(int minutes, int seconds, long counter);
 }
