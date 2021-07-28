@@ -11,10 +11,15 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -33,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private Button startStopBtn;
     private Button fifteenMinutesBtn;
     private Button twentyMinutesBtn;
+    private Toolbar toolbar;
     private MyChronometer chronometerView;
     private MyChronometerService service;
     private ServiceConnection connection;
@@ -46,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mainActivityPresenter = new MainActivityPresenterImpl();
         mainActivityPresenter.setStateInactive();
+        setupToolbar();
         setupChronometer();
         setupReceiver();
         registerReceiver();
@@ -56,6 +63,34 @@ public class MainActivity extends AppCompatActivity {
         setupFifteenMinutesBtn();
         setupTwentyMinutesBtn();
         setupTestButton();
+    }
+
+    private void setupToolbar() {
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setOnMenuItemClickListener(item -> {
+            Toast.makeText(MainActivity.this, "Hi", Toast.LENGTH_SHORT).show();
+            return true;
+        });
+        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_credits, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.settings:
+//                Intent intent = new Intent(this, SettingsActivity.class);
+//                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
+//                break;
+//        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupTwentyMinutesBtn() {

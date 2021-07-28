@@ -10,4 +10,5 @@
     <string name="txt_btn_pomodoro_finished_dialog">Ok</string>
     <string name="channel_name">Pomodoro</string>
     <string name="channel_description">Pomodoro is running</string>
+    <string name="txt_menu_item_credits">Credits</string>
 </resources>
