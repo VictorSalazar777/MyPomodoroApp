@@ -87,7 +87,7 @@ public class MyChronometerService extends Service {
 
     private NotificationCompat.Builder getNotificationBuilder() {
         return new NotificationCompat.Builder(this, POMODORO_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("title")
                 .setContentText("text")
                 .setSubText("subtext")
