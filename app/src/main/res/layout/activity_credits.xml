@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    >
+    <TextView
+        android:id="@+id/txv_author_credits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text = "@string/txt_author_credits"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <TextView
+        android:id="@+id/txv_clock_sound_credits"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/txt_clock_sound_credits"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@id/txv_author_credits"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

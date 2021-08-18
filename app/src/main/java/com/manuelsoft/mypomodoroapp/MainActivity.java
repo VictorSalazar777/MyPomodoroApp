@@ -14,11 +14,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -67,10 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupToolbar() {
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setOnMenuItemClickListener(item -> {
-            Toast.makeText(MainActivity.this, "Hi", Toast.LENGTH_SHORT).show();
-            return true;
-        });
         setSupportActionBar(toolbar);
     }
 
@@ -82,13 +76,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.settings:
-//                Intent intent = new Intent(this, SettingsActivity.class);
-//                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(intent);
-//                break;
-//        }
+        if (item.getItemId() == R.id.item_credits) {
+            Log.d(TAG, "Credits");
+            Intent intent = new Intent(this, CreditsActivity.class);
+              //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
