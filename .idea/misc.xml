@@ -10,8 +10,9 @@
       <map>
         <entry key="../../../../../layout/custom_preview.xml" value="0.19583333333333333" />
         <entry key="app/src/debug/res/layout/activity_main.xml" value="0.1796875" />
+        <entry key="app/src/main/res/drawable/chronometer.xml" value="0.19583333333333333" />
         <entry key="app/src/main/res/layout/activity_credits.xml" value="0.1796875" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.18" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="app/src/main/res/menu/menu_credits.xml" value="0.1" />
       </map>
     </option>
