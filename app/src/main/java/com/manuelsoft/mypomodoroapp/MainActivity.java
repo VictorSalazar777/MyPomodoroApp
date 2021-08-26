@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.annotation.VisibleForTesting;
@@ -294,6 +295,7 @@ public class MainActivity extends AppCompatActivity {
     public void setupTestButton() {
         if (BuildConfig.DEBUG) {
             Button testBtn = findViewById(R.id.btn_test);
+            testBtn.setVisibility(View.VISIBLE);
             testBtn.setOnClickListener(v -> {
                 Log.d(TAG, "Click on button Test");
                 mainActivityPresenter.setStateActive();
