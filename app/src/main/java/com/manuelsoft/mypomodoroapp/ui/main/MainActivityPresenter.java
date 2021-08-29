@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.ui.main;
 
 public interface MainActivityPresenter {
 

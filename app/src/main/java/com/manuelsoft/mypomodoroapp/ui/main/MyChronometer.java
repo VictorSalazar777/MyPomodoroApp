@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.ui.main;
 
 import android.content.Context;
 import android.util.AttributeSet;

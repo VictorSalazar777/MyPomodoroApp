@@ -1,9 +1,11 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.ui.credits;
 
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.manuelsoft.mypomodoroapp.R;
 
 public class CreditsActivity extends AppCompatActivity {
     @Override

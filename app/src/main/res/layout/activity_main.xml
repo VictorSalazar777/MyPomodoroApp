@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".ui.main.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -68,7 +68,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.75" />
 
-    <com.manuelsoft.mypomodoroapp.MyChronometer
+    <com.manuelsoft.mypomodoroapp.ui.main.MyChronometer
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,6 +1,6 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.ui.main;
 
-class MainActivityPresenterImpl implements MainActivityPresenter {
+public class MainActivityPresenterImpl implements MainActivityPresenter {
 
     private Boolean activeState = false;
     private int minutes = TWENTY;

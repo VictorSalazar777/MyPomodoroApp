@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.chronometer;
 
 import android.os.CountDownTimer;
 

@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.audio;
 
 import android.content.Context;
 import android.database.ContentObserver;
@@ -10,7 +10,7 @@ import android.util.Log;
 public class VolumeContentObserver extends ContentObserver {
     private final AudioManager audioManager;
     private final OnChangeVolume onChangeVolume;
-    interface OnChangeVolume {
+    public interface OnChangeVolume {
         void onChange(int volume);
     }
     public static final String TAG = VolumeContentObserver.class.getName();

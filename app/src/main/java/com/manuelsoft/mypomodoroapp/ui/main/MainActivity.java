@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.ui.main;
 
 import android.app.ActivityManager;
 import android.app.AlertDialog;
@@ -22,13 +22,17 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.manuelsoft.mypomodoroapp.MyChronometerService.MyChronometerBinder;
+import com.manuelsoft.mypomodoroapp.BuildConfig;
+import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
+import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
+import com.manuelsoft.mypomodoroapp.R;
+import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
-import static com.manuelsoft.mypomodoroapp.MainActivityPresenter.TWENTY;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_FINISH;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_TEST;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.ACTION_TICK;
-import static com.manuelsoft.mypomodoroapp.MyChronometerService.TIME;
+import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityPresenter.TWENTY;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.TIME;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.manuelsoft.mypomodoroapp;
+package com.manuelsoft.mypomodoroapp.chronometer;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -17,6 +17,11 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.manuelsoft.mypomodoroapp.R;
+import com.manuelsoft.mypomodoroapp.audio.AudioPlayer;
+import com.manuelsoft.mypomodoroapp.audio.VolumeContentObserver;
+import com.manuelsoft.mypomodoroapp.ui.main.MainActivity;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 

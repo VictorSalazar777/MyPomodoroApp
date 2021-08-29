@@ -1,5 +1,8 @@
 package com.manuelsoft.mypomodoroapp;
 
+import com.manuelsoft.mypomodoroapp.ui.main.MainActivityPresenter;
+import com.manuelsoft.mypomodoroapp.ui.main.MainActivityPresenterImpl;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
