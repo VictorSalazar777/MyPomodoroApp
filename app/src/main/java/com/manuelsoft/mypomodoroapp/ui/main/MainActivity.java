@@ -262,11 +262,8 @@ public class MainActivity extends AppCompatActivity {
         chronometerView.setActive(false);
         startStopBtn.setText(R.string.txt_btn_start);
         mainActivityPresenter.setStateInactive();
-        if (mainActivityPresenter.getHowManyMinutes() == TWENTY) {
-            fifteenMinutesBtn.setEnabled(true);
-        } else {
-            twentyMinutesBtn.setEnabled(true);
-        }
+        fifteenMinutesBtn.setEnabled(true);
+        twentyMinutesBtn.setEnabled(true);
     }
 
     private void showFinishPomodoroDialog() {
