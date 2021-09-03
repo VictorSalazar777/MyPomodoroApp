@@ -22,6 +22,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.material.button.MaterialButton;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
@@ -39,8 +40,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = MainActivity.class.getName();
     private MainActivityPresenter mainActivityPresenter;
     private Button startStopBtn;
-    private Button fifteenMinutesBtn;
-    private Button twentyMinutesBtn;
+    private MaterialButton fifteenMinutesBtn;
+    private MaterialButton twentyMinutesBtn;
     private Toolbar toolbar;
     private MyChronometer chronometerView;
     private MyChronometerService service;
@@ -93,11 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupTwentyMinutesBtn() {
         twentyMinutesBtn = findViewById(R.id.btn_twenty_min);
-        twentyMinutesBtn.setEnabled(false);
         twentyMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityPresenter.isActive()) {
-                twentyMinutesBtn.setEnabled(false);
-                fifteenMinutesBtn.setEnabled(true);
                 mainActivityPresenter.setTwentyMinutes();
                 chronometerView.setText(R.string.txt_twenty_minutes);
             }
@@ -106,11 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupFifteenMinutesBtn() {
         fifteenMinutesBtn = findViewById(R.id.btn_fifteen_min);
-        fifteenMinutesBtn.setEnabled(true);
         fifteenMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityPresenter.isActive()) {
-                twentyMinutesBtn.setEnabled(true);
-                fifteenMinutesBtn.setEnabled(false);
                 mainActivityPresenter.setFifteenMinutes();
                 chronometerView.setText(R.string.txt_fifteen_minutes);
             }
@@ -125,12 +120,12 @@ public class MainActivity extends AppCompatActivity {
                 chronometerView.setActive(false);
                 startStopBtn.setText(R.string.txt_btn_start);
                 if (mainActivityPresenter.getHowManyMinutes() == TWENTY) {
-                    fifteenMinutesBtn.setEnabled(true);
                     chronometerView.setText(R.string.txt_twenty_minutes);
                 } else {
-                    twentyMinutesBtn.setEnabled(true);
                     chronometerView.setText(R.string.txt_fifteen_minutes);
                 }
+                fifteenMinutesBtn.setEnabled(true);
+                twentyMinutesBtn.setEnabled(true);
                 stopChronometer();
             } else {
                 mainActivityPresenter.setStateActive();

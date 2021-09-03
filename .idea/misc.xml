@@ -13,8 +13,9 @@
         <entry key="app/src/main/res/drawable/button_border.xml" value="0.19583333333333333" />
         <entry key="app/src/main/res/drawable/chronometer.xml" value="0.19583333333333333" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.19583333333333333" />
+        <entry key="app/src/main/res/drawable/time_button.xml" value="0.18981481481481483" />
         <entry key="app/src/main/res/layout/activity_credits.xml" value="0.1796875" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.15555152473564873" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.5" />
         <entry key="app/src/main/res/menu/menu_credits.xml" value="0.1" />
       </map>
     </option>
