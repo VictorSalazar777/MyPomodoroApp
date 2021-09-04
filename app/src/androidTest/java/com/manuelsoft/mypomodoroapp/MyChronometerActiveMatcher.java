@@ -6,6 +6,8 @@ import android.widget.Chronometer;
 
 import androidx.test.espresso.matcher.BoundedMatcher;
 
+import com.manuelsoft.mypomodoroapp.ui.main.MyChronometer;
+
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
@@ -42,7 +44,7 @@ public class MyChronometerActiveMatcher {
             throw new IllegalArgumentException("Null value");
         }
 
-        return new BoundedMatcher<View, MyChronometer>(MyChronometer.class) {
+        return new BoundedMatcher<>(MyChronometer.class) {
             @Override
             public void describeTo(Description description) {
                 description.appendText("with isTheFinalCountDown: ");

@@ -3,6 +3,7 @@ package com.manuelsoft.mypomodoroapp;
 import android.os.SystemClock;
 import android.util.Log;
 
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -10,6 +11,8 @@ import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.UiDevice;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
+
+import com.manuelsoft.mypomodoroapp.ui.main.MainActivity;
 
 import org.junit.After;
 import org.junit.Rule;
@@ -194,14 +197,14 @@ public class UITest {
     }
 
     @Test
-    public void GivenTheFirstRunning_ThenStatusInactiveAndChronometerShowsTwentyMinutesAndTwentyMinutesBtnDisabledAndFifteenMinutesBtnEnabled() {
+    public void WhenTheAppJustStarted_ThenStatusInactiveAndChronometerShowsTwentyMinutesAndTwentyMinutesBtnEnabledAndFifteenMinutesBtnEnabled() {
         Log.d(TAG, "Checking initial state");
         onView(withId(R.id.chronometer))
                 .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
 
         Log.d(TAG, "Checking first running requirements");
         onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
-        onView(withId(R.id.btn_twenty_min)).check(matches(isNotEnabled()));
+        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
         onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
     }
 
@@ -229,43 +232,6 @@ public class UITest {
 
         Log.d(TAG,  "Checking chronometer text");
         onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
-    }
-
-    @Test
-    public void GivenStatusInactiveAfterClicksOnFifteenMinutesBtn_WhenClickTwentyMinutesBtn_ThenFifteenMinutesBtnIsEnabledAndTwentyMinutesBtnIsDisabled() {
-        Log.d(TAG,  "Clicking fifteen button");
-        onView(withId(R.id.btn_fifteen_min)).perform(click());
-
-        Log.d(TAG, "Checking required state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG,  "Clicking twenty button");
-        onView(withId(R.id.btn_twenty_min)).perform(click());
-
-        Log.d(TAG,  "Checking if FifteenMinutesBtn is disabled");
-        onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
-
-        Log.d(TAG,  "Checking if TwentyMinutesBtn is enabled");
-        onView(withId(R.id.btn_twenty_min)).check(matches(isNotEnabled()));
-
-    }
-
-    @Test
-    public void GivenStatusInactive_WhenClickFifteenMinutesBtn_ThenFifteenMinutesBtnIsDisabledAndTwentyMinutesBtnIsEnabled() {
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG,  "Clicking fifteen button");
-        onView(withId(R.id.btn_fifteen_min)).perform(click());
-
-        Log.d(TAG,  "Checking if FifteenMinutesBtn is disabled");
-        onView(withId(R.id.btn_fifteen_min)).check(matches(isNotEnabled()));
-
-        Log.d(TAG,  "Checking if TwentyMinutesBtn is enabled");
-        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
-
     }
 
     @Test
@@ -314,9 +280,11 @@ public class UITest {
     public void testForegroundServiceNotification() {
         uiDevice = UiDevice.getInstance(getInstrumentation());
         boolean open = uiDevice.openNotification();
-        // uiDevice.wait(Until.hasObject(By.pkg("com.android.systemui")), 10000);
-
-        Log.d(TAG, "Check if notification opened");
-        assertThat(open, is(true));
+        boolean ok = uiDevice.wait(Until.hasObject(
+                By.text(ApplicationProvider.getApplicationContext().getString(R.string.app_name))), 1000);
+        assertThat(ok, is(true));
+        if (open) {
+            uiDevice.pressBack();
+        }
     }
 }
