@@ -41,15 +41,16 @@ public class MyChronometerService extends Service {
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private NotificationCompat.Builder notificationBuilder;
+    private Notification notification;
     private AudioPlayer audioPlayer;
     private VolumeContentObserver volumeContentObserver;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        setupAudio();
+        notification = createNotification();
         myChronometerTask = new MyChronometerTask();
-        audioPlayer = new AudioPlayer();
-        audioPlayer.init();
     }
 
     @Nullable
@@ -60,12 +61,19 @@ public class MyChronometerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        startForeground(NOTIFICATION_SERVICE_ID, notification);
+        return START_NOT_STICKY;
+    }
+
+    private Notification createNotification() {
         createChannel();
         notificationBuilder = getNotificationBuilder();
-        Notification notification = notificationBuilder.build();
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//        notificationManager.notify(NOTIFICATION_SERVICE_ID, notification);
-        startForeground(NOTIFICATION_SERVICE_ID, notification);
+        return notificationBuilder.build();
+    }
+
+    private void setupAudio() {
+        audioPlayer = new AudioPlayer();
+        audioPlayer.init();
         audioPlayer.loadSound(this, R.raw.clock);
         volumeContentObserver = new VolumeContentObserver(this, null,
                 volume -> audioPlayer.setVolume(volume));
@@ -75,7 +83,6 @@ public class MyChronometerService extends Service {
                         android.provider.Settings.System.CONTENT_URI,
                         true,
                         volumeContentObserver);
-        return START_NOT_STICKY;
     }
 
     private void createChannel() {
