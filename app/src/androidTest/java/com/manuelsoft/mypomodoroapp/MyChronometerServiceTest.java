@@ -89,5 +89,4 @@ public class MyChronometerServiceTest {
         assertThat(name, notNullValue());
     }
 
-
 }

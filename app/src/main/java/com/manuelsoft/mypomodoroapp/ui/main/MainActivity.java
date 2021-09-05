@@ -1,6 +1,5 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -27,6 +26,7 @@ import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
 import com.manuelsoft.mypomodoroapp.R;
+import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityPresenter.TWENTY;
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             service.startChronometer();
         }
         Log.d(TAG, "Sending message");
-        Log.d(TAG, "service running: " + isMyServiceRunning(MyChronometerService.class));
+        Log.d(TAG, "service running: " + Utilities.isMyServiceRunning(this, MyChronometerService.class));
     }
 
     private void stopChronometer() {
@@ -275,16 +275,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .create()
                 .show();
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @VisibleForTesting
