@@ -77,12 +77,21 @@ public class MyChronometerService extends Service {
         audioPlayer.loadSound(this, R.raw.clock);
         volumeContentObserver = new VolumeContentObserver(this, null,
                 volume -> audioPlayer.setVolume(volume));
+    }
+
+    private void registerVolumeContentObserver() {
         getApplicationContext()
                 .getContentResolver()
                 .registerContentObserver(
                         android.provider.Settings.System.CONTENT_URI,
                         true,
                         volumeContentObserver);
+    }
+
+    private void unregisterVolumeContentObserver() {
+        getApplicationContext()
+                .getContentResolver()
+                .unregisterContentObserver(volumeContentObserver);
     }
 
     private void createChannel() {
@@ -152,12 +161,14 @@ public class MyChronometerService extends Service {
             sendMessage(ACTION_FINISH, null, null);
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
+            unregisterVolumeContentObserver();
         };
 
         myChronometerTask.set(pomodoroMinutes, myTask, end);
     }
 
     public void startChronometer() {
+        registerVolumeContentObserver();
 //        handler.post(() -> {
 //            Log.d(TAG, Looper.myLooper().getThread().getName());
 //            myChronometerTask.execute();
@@ -179,6 +190,7 @@ public class MyChronometerService extends Service {
         chronometerHandler.getLooper().quit();
         // chronometerHandler.removeCallbacksAndMessages(null);
         audioPlayer.stop();
+        unregisterVolumeContentObserver();
     }
 
 
