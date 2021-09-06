@@ -19,6 +19,7 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.button.MaterialButton;
@@ -29,16 +30,16 @@ import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
-import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityPresenter.TWENTY;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.TIME;
+import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.TWENTY;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getName();
-    private MainActivityPresenter mainActivityPresenter;
+    private MainActivityViewModel mainActivityViewModel;
     private Button startStopBtn;
     private MaterialButton fifteenMinutesBtn;
     private MaterialButton twentyMinutesBtn;
@@ -54,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mainActivityPresenter = new MainActivityPresenterImpl();
-        mainActivityPresenter.setStateInactive();
+        mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        mainActivityViewModel.setStateInactive();
         setupToolbar();
         setupChronometer();
         setupReceiver();
@@ -95,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupTwentyMinutesBtn() {
         twentyMinutesBtn = findViewById(R.id.btn_twenty_min);
         twentyMinutesBtn.setOnClickListener(v -> {
-            if (!mainActivityPresenter.isActive()) {
-                mainActivityPresenter.setTwentyMinutes();
+            if (!mainActivityViewModel.isActive()) {
+                mainActivityViewModel.setTwentyMinutes();
                 chronometerView.setText(R.string.txt_twenty_minutes);
             }
         });
@@ -105,8 +106,8 @@ public class MainActivity extends AppCompatActivity {
     private void setupFifteenMinutesBtn() {
         fifteenMinutesBtn = findViewById(R.id.btn_fifteen_min);
         fifteenMinutesBtn.setOnClickListener(v -> {
-            if (!mainActivityPresenter.isActive()) {
-                mainActivityPresenter.setFifteenMinutes();
+            if (!mainActivityViewModel.isActive()) {
+                mainActivityViewModel.setFifteenMinutes();
                 chronometerView.setText(R.string.txt_fifteen_minutes);
             }
         });
@@ -115,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
     private void setupStartStopBtn() {
         startStopBtn = findViewById(R.id.btn_start_stop);
         startStopBtn.setOnClickListener(v -> {
-            if (mainActivityPresenter.isActive()) {
-                mainActivityPresenter.setStateInactive();
+            if (mainActivityViewModel.isActive()) {
+                mainActivityViewModel.setStateInactive();
                 chronometerView.setActive(false);
                 startStopBtn.setText(R.string.txt_btn_start);
-                if (mainActivityPresenter.getHowManyMinutes() == TWENTY) {
+                if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
                     chronometerView.setText(R.string.txt_twenty_minutes);
                 } else {
                     chronometerView.setText(R.string.txt_fifteen_minutes);
@@ -128,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 twentyMinutesBtn.setEnabled(true);
                 stopChronometer();
             } else {
-                mainActivityPresenter.setStateActive();
+                mainActivityViewModel.setStateActive();
                 chronometerView.setActive(true);
                 startStopBtn.setText(R.string.txt_btn_stop);
                 fifteenMinutesBtn.setEnabled(false);
@@ -140,13 +141,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupChronometer() {
         chronometerView = findViewById(R.id.chronometer);
-        String minutes = mainActivityPresenter.getHowManyMinutes() + ":00";
+        String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
         chronometerView.setText(minutes);
     }
 
     private void startChronometer() {
         if (bound) {
-            service.setChronometer(mainActivityPresenter.getHowManyMinutes());
+            service.setChronometer(mainActivityViewModel.getHowManyMinutes());
             service.startChronometer();
         }
         Log.d(TAG, "Sending message");
@@ -261,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
     private void onFinishPomodoro() {
         chronometerView.setActive(false);
         startStopBtn.setText(R.string.txt_btn_start);
-        mainActivityPresenter.setStateInactive();
+        mainActivityViewModel.setStateInactive();
         fifteenMinutesBtn.setEnabled(true);
         twentyMinutesBtn.setEnabled(true);
     }
@@ -284,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
             testBtn.setVisibility(View.VISIBLE);
             testBtn.setOnClickListener(v -> {
                 Log.d(TAG, "Click on button Test");
-                mainActivityPresenter.setStateActive();
+                mainActivityViewModel.setStateActive();
                 chronometerView.setActive(true);
                 service.sendOneTick();
             });
