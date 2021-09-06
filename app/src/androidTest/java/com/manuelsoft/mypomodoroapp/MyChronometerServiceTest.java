@@ -5,13 +5,14 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 
-import androidx.core.content.ContextCompat;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ServiceTestRule;
 
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
+import com.manuelsoft.mypomodoroapp.common.Utilities;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,10 +30,15 @@ public class MyChronometerServiceTest {
 
     @Rule
     public final ServiceTestRule serviceTestRule = new ServiceTestRule();
+    Intent intent;
+
+    @Before
+    public void setup() {
+        intent = new Intent(getApplicationContext(), MyChronometerService.class);
+    }
 
     @Test
     public void serviceIsStartedCorrectly() throws TimeoutException {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
         getApplicationContext().startService(intent);
 
         IBinder binder = serviceTestRule.bindService(intent);
@@ -43,15 +49,12 @@ public class MyChronometerServiceTest {
 
     @Test
     public void startChronometer_chronometerIsStartedCorrectly() throws TimeoutException, InterruptedException {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
         getApplicationContext().startService(intent);
-
         IBinder binder = serviceTestRule.bindService(intent);
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
 
+        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
-
         Thread.sleep(100);
 
         assertThat(service.chronometerIsActive(), is(true));
@@ -59,17 +62,13 @@ public class MyChronometerServiceTest {
 
     @Test
     public void stopChronometer_chronometerIsFinishedCorrectly() throws TimeoutException, InterruptedException {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
         getApplicationContext().startService(intent);
-
         IBinder binder = serviceTestRule.bindService(intent);
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
 
+        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
-
         Thread.sleep(100);
-
         service.stopChronometer();
 
         assertThat(service.chronometerIsActive(), is(false));
@@ -77,7 +76,6 @@ public class MyChronometerServiceTest {
 
     @Test
     public void startForegroundService() {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
         ComponentName name;
 
         if (Build.VERSION.SDK_INT >= 26) {
@@ -89,4 +87,36 @@ public class MyChronometerServiceTest {
         assertThat(name, notNullValue());
     }
 
+    @Test
+    public void serviceIsRunInTheBackgroundWhenChronometerIsInactive() throws InterruptedException, TimeoutException {
+        getApplicationContext().startService(intent);
+        IBinder binder = serviceTestRule.bindService(intent);
+
+        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        service.setChronometer(20);
+        service.startChronometer();
+        Thread.sleep(100);
+        service.stopChronometer();
+
+        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), MyChronometerService.class);
+
+        assertThat(foreground, is(false));
+    }
+
+    @Test
+    public void serviceIsRunInTheForegroundWhenChronometerIsActive() throws TimeoutException, InterruptedException {
+        getApplicationContext().startService(intent);
+        IBinder binder = serviceTestRule.bindService(intent);
+
+        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        service.setChronometer(20);
+        service.startChronometer();
+        Thread.sleep(100);
+
+        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), MyChronometerService.class);
+        service.stopChronometer();
+
+        assertThat(foreground, is(true));
+
+    }
 }

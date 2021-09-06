@@ -61,8 +61,7 @@ public class MyChronometerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        startForeground(NOTIFICATION_SERVICE_ID, notification);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     private Notification createNotification() {
@@ -162,12 +161,14 @@ public class MyChronometerService extends Service {
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
             unregisterVolumeContentObserver();
+            stopForeground(true);
         };
 
         myChronometerTask.set(pomodoroMinutes, myTask, end);
     }
 
     public void startChronometer() {
+        startForeground(NOTIFICATION_SERVICE_ID, notification);
         registerVolumeContentObserver();
 //        handler.post(() -> {
 //            Log.d(TAG, Looper.myLooper().getThread().getName());
@@ -191,6 +192,7 @@ public class MyChronometerService extends Service {
         // chronometerHandler.removeCallbacksAndMessages(null);
         audioPlayer.stop();
         unregisterVolumeContentObserver();
+        stopForeground(true);
     }
 
 
@@ -217,7 +219,6 @@ public class MyChronometerService extends Service {
         }
         audioPlayer.release();
         getApplicationContext().getContentResolver().unregisterContentObserver(volumeContentObserver);
-        stopForeground(true);
         super.onDestroy();
     }
 

@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         setupChronometer();
         setupReceiver();
         registerReceiver();
-        startForegroundService();
+        // startForegroundService();
         setupServiceConnection();
         bindService();
         setupStartStopBtn();
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Credits");
             Intent intent = new Intent(this, CreditsActivity.class);
               //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
             service.startChronometer();
         }
         Log.d(TAG, "Sending message");
-        Log.d(TAG, "service running: " + Utilities.isMyServiceRunning(this, MyChronometerService.class));
+        Log.d(TAG, "service running: " + Utilities.isServiceRunning(this, MyChronometerService.class));
     }
 
     private void stopChronometer() {
@@ -298,9 +298,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (!mainActivityPresenter.isActive()) {
-            stopForegroundService();
-        }
+//        if (!mainActivityPresenter.isActive()) {
+//            stopForegroundService();
+//        }
         super.onDestroy();
     }
 }
