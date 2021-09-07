@@ -1,5 +1,6 @@
 package com.manuelsoft.mypomodoroapp;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -30,6 +31,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.isNotEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static com.manuelsoft.mypomodoroapp.ui.main.MainActivity.UI_SHARED_PREFERENCES;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(AndroidJUnit4.class)
@@ -48,6 +50,11 @@ public class UITest {
     @After
     public void destroyService() {
         activityTestRule.getScenario().onActivity(MainActivity::destroyService);
+        ApplicationProvider.getApplicationContext()
+                .getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE)
+        .edit()
+        .clear()
+        .apply();
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
+import android.util.Log;
+
 import androidx.lifecycle.ViewModel;
 
 public class MainActivityViewModel extends ViewModel {
@@ -8,6 +10,7 @@ public class MainActivityViewModel extends ViewModel {
     public static final int TWENTY = 20;
     private Boolean activeState = false;
     private int minutes = TWENTY;
+    public static final String TAG = MainActivityViewModel.class.getName();
 
     public void setStateActive() {
         activeState = true;
@@ -33,4 +36,9 @@ public class MainActivityViewModel extends ViewModel {
         return minutes;
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        Log.d(TAG, "On cleared");
+    }
 }
