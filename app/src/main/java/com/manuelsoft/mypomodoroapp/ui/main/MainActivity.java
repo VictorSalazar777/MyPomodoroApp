@@ -85,7 +85,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean loadChronometerIsRunning() {
-        return getUISharedPreferences().getBoolean(CHRONOMETER_IS_RUNNING, false);
+        boolean result = getUISharedPreferences().getBoolean(CHRONOMETER_IS_RUNNING, false);
+        Log.d(TAG, "loadChronometerIsRunning(): " + result);
+        return result;
     }
 
     private int loadTimeSelected() {
@@ -94,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        if (loadChronometerIsRunning()) {
+        if (loadChronometerIsRunning() && isChronometerServiceInTheForeground()) {
             mainActivityViewModel.setStateActive();
         } else {
             mainActivityViewModel.setStateInactive();
@@ -106,6 +108,12 @@ public class MainActivity extends AppCompatActivity {
             mainActivityViewModel.setTwentyMinutes();
         }
 
+    }
+
+    private boolean isChronometerServiceInTheForeground() {
+        boolean result = Utilities.isForegroundServiceRunning(this, MyChronometerService.class);
+        Log.d(TAG, "isChronometerServiceInTheForeground(): " + result);
+        return result;
     }
 
     private void setupToolbar() {
@@ -179,10 +187,10 @@ public class MainActivity extends AppCompatActivity {
                 startStopBtn.setText(R.string.txt_btn_start);
                 if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
                     chronometerView.setText(R.string.txt_twenty_minutes);
-                    saveUISharedPreferences(true, TWENTY);
+                    saveUISharedPreferences(false, TWENTY);
                 } else {
                     chronometerView.setText(R.string.txt_fifteen_minutes);
-                    saveUISharedPreferences(true, FIFTEEN);
+                    saveUISharedPreferences(false, FIFTEEN);
                 }
                 fifteenMinutesBtn.setEnabled(true);
                 twentyMinutesBtn.setEnabled(true);
@@ -190,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mainActivityViewModel.setStateActive();
                 chronometerView.setActive(true);
-                saveUISharedPreferences(false, mainActivityViewModel.getHowManyMinutes());
+                saveUISharedPreferences(true, mainActivityViewModel.getHowManyMinutes());
                 startStopBtn.setText(R.string.txt_btn_stop);
                 fifteenMinutesBtn.setEnabled(false);
                 twentyMinutesBtn.setEnabled(false);
