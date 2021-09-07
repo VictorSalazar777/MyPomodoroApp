@@ -48,8 +48,12 @@ public class UITest {
             new ActivityScenarioRule<>(MainActivity.class);
 
     @After
-    public void destroyService() {
+    public void finish() {
         activityTestRule.getScenario().onActivity(MainActivity::destroyService);
+        cleanUISharedPreferences();
+    }
+
+    private void cleanUISharedPreferences() {
         ApplicationProvider.getApplicationContext()
                 .getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE)
         .edit()

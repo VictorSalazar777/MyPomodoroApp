@@ -108,9 +108,9 @@ public class MyChronometerService extends Service {
     private NotificationCompat.Builder getNotificationBuilder() {
         return new NotificationCompat.Builder(this, POMODORO_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("title")
+                .setContentTitle("Pomodoro is running!")
                 .setContentText("text")
-                .setSubText("subtext")
+                .setSubText("Pomodoro is running!")
                 //.setTicker() //TODO: Implement this for accessibility
                 .setContentIntent(getPendingIntent())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
@@ -118,8 +118,8 @@ public class MyChronometerService extends Service {
 
     private PendingIntent getPendingIntent() {
         Intent intent = new Intent(this, MainActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 this,
                 0,

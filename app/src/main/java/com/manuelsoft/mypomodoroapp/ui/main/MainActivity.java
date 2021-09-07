@@ -19,7 +19,6 @@ import android.widget.Button;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         setupChronometer();
         setupReceiver();
         registerReceiver();
-        // startForegroundService();
+        startService();
         setupServiceConnection();
         bindService();
         setupStartStopBtn();
@@ -222,9 +221,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startForegroundService() {
+    private void startService() {
         Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
-        ContextCompat.startForegroundService(this,intent );
+        startService(intent);
     }
 
     private void stopForegroundService() {
@@ -251,7 +250,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void bindService() {
         Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
-        // startService(intent);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
