@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupViewModel();
         setupToolbar();
-        setupChronometer();
+        createChronometer();
         setupReceiver();
         registerReceiver();
         startService();
@@ -215,11 +215,20 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupChronometer() {
+    private void createChronometer() {
         chronometerView = findViewById(R.id.chronometer);
-        String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
-        chronometerView.setText(minutes);
-        chronometerView.setActive(mainActivityViewModel.isActive());
+    }
+
+    private void setupChronometer() {
+        if (!mainActivityViewModel.isActive()) {
+            String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
+            chronometerView.setText(minutes);
+            chronometerView.setActive(false);
+        } else {
+            String minutes = service.getLastTime();
+            chronometerView.setText(minutes);
+            chronometerView.setActive(true);
+        }
     }
 
     private void startChronometer() {
@@ -255,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
                 bound = true;
                 MyChronometerBinder binder = (MyChronometerBinder) service;
                 MainActivity.this.service = binder.getService();
+                setupChronometer();
             }
 
             @Override

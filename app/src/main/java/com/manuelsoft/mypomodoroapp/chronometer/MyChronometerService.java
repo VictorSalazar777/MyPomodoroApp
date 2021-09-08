@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
@@ -22,7 +23,6 @@ import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.audio.AudioPlayer;
 import com.manuelsoft.mypomodoroapp.audio.VolumeContentObserver;
 import com.manuelsoft.mypomodoroapp.ui.main.MainActivity;
-
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 
@@ -45,6 +45,7 @@ public class MyChronometerService extends Service {
     private VolumeContentObserver volumeContentObserver;
     private NotificationManager notificationManager;
     private Handler mainThreadHandler;
+    private String lastTime;
 
     @Override
     public void onCreate() {
@@ -156,6 +157,7 @@ public class MyChronometerService extends Service {
         MyTask myTask = (minutes, seconds, counter) -> {
             String time = myChronometerTask.print(minutes, seconds);
             sendMessage(ACTION_TICK, TIME, time);
+            lastTime = time;
             mainThreadHandler.post(() -> {
                 notificationBuilder.setContentText(time);
                 notificationManager.notify(NOTIFICATION_SERVICE_ID, notificationBuilder.build());
@@ -175,6 +177,10 @@ public class MyChronometerService extends Service {
         };
 
         myChronometerTask.set(pomodoroMinutes, myTask, end);
+    }
+
+    public String getLastTime() {
+        return lastTime;
     }
 
     public void startChronometer() {
