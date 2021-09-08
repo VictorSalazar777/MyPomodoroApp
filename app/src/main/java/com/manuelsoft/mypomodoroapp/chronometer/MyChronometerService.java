@@ -1,6 +1,5 @@
 package com.manuelsoft.mypomodoroapp.chronometer;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -16,6 +15,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.manuelsoft.mypomodoroapp.R;
@@ -41,16 +41,20 @@ public class MyChronometerService extends Service {
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private NotificationCompat.Builder notificationBuilder;
-    private Notification notification;
     private AudioPlayer audioPlayer;
     private VolumeContentObserver volumeContentObserver;
+    private NotificationManager notificationManager;
+    private Handler mainThreadHandler;
 
     @Override
     public void onCreate() {
         super.onCreate();
         setupAudio();
-        notification = createNotification();
+        createNotificationChannel();
+        notificationBuilder = createNotificationBuilder();
         myChronometerTask = new MyChronometerTask();
+        notificationManager = getNotificationManager();
+        mainThreadHandler = new Handler(getMainLooper());
     }
 
     @Nullable
@@ -62,12 +66,6 @@ public class MyChronometerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return START_STICKY;
-    }
-
-    private Notification createNotification() {
-        createChannel();
-        notificationBuilder = getNotificationBuilder();
-        return notificationBuilder.build();
     }
 
     private void setupAudio() {
@@ -93,19 +91,22 @@ public class MyChronometerService extends Service {
                 .unregisterContentObserver(volumeContentObserver);
     }
 
-    private void createChannel() {
+    private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(POMODORO_CHANNEL_ID, name, importance);
             channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
+            getNotificationManager().createNotificationChannel(channel);
         }
     }
 
-    private NotificationCompat.Builder getNotificationBuilder() {
+    private NotificationManager getNotificationManager() {
+        return ContextCompat.getSystemService(this, NotificationManager.class);
+    }
+
+    private NotificationCompat.Builder createNotificationBuilder() {
         return new NotificationCompat.Builder(this, POMODORO_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("Pomodoro is running!")
@@ -113,7 +114,8 @@ public class MyChronometerService extends Service {
                 .setSubText("Pomodoro is running!")
                 //.setTicker() //TODO: Implement this for accessibility
                 .setContentIntent(getPendingIntent())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true);
     }
 
     private PendingIntent getPendingIntent() {
@@ -154,22 +156,29 @@ public class MyChronometerService extends Service {
         MyTask myTask = (minutes, seconds, counter) -> {
             String time = myChronometerTask.print(minutes, seconds);
             sendMessage(ACTION_TICK, TIME, time);
+            mainThreadHandler.post(() -> {
+                notificationBuilder.setContentText(time);
+                notificationManager.notify(NOTIFICATION_SERVICE_ID, notificationBuilder.build());
+            });
         };
 
         MyTask end = (minutes, seconds, counter) -> {
+            mainThreadHandler.post(() -> {
+                stopForeground(true);
+                unregisterVolumeContentObserver();
+            });
+
             isRunning = false;
             sendMessage(ACTION_FINISH, null, null);
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
-            unregisterVolumeContentObserver();
-            stopForeground(true);
         };
 
         myChronometerTask.set(pomodoroMinutes, myTask, end);
     }
 
     public void startChronometer() {
-        startForeground(NOTIFICATION_SERVICE_ID, notification);
+        startForeground(NOTIFICATION_SERVICE_ID, notificationBuilder.build());
         registerVolumeContentObserver();
 //        handler.post(() -> {
 //            Log.d(TAG, Looper.myLooper().getThread().getName());
