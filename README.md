@@ -11,4 +11,11 @@ I used:
 * Audio.
 * TDD.
 * Mockito.
-* Presenter.
+* ViewModel (MVVM).
+* Activity.
+* Service.
+* Broadcast receiver.
+* Shared preferences.
+* Material components.
+
+![Alt text](/screenshots/mypomodoroapp1.png?raw=true "MyPomodoroApp screenshot")
