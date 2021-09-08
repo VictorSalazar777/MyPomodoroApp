@@ -73,32 +73,12 @@ public class MainActivity extends AppCompatActivity {
         setupTestButton();
     }
 
-    private SharedPreferences getUISharedPreferences() {
-        return getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-    }
-
-    private void saveUISharedPreferences(boolean chronometerIsRunning, int time) {
-        getUISharedPreferences().edit()
-                .putBoolean(CHRONOMETER_IS_RUNNING, chronometerIsRunning)
-                .putInt(TIME_SELECTED, time)
-        .apply();
-    }
-
-    private boolean loadChronometerIsRunning() {
-        boolean result = getUISharedPreferences().getBoolean(CHRONOMETER_IS_RUNNING, false);
-        Log.d(TAG, "loadChronometerIsRunning(): " + result);
-        return result;
-    }
-
-    private int loadTimeSelected() {
-        return getUISharedPreferences().getInt(TIME_SELECTED, TWENTY);
-    }
-
     private void setupViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         if (loadChronometerIsRunning() && isChronometerServiceInTheForeground()) {
             mainActivityViewModel.setStateActive();
         } else {
+            cleanUISharedPreferences();
             mainActivityViewModel.setStateInactive();
         }
 
@@ -110,10 +90,38 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private boolean loadChronometerIsRunning() {
+        boolean result = getUISharedPreferences().getBoolean(CHRONOMETER_IS_RUNNING, false);
+        Log.d(TAG, "loadChronometerIsRunning(): " + result);
+        return result;
+    }
+
     private boolean isChronometerServiceInTheForeground() {
         boolean result = Utilities.isForegroundServiceRunning(this, MyChronometerService.class);
         Log.d(TAG, "isChronometerServiceInTheForeground(): " + result);
         return result;
+    }
+
+    private void cleanUISharedPreferences() {
+        getUISharedPreferences()
+                .edit()
+                .clear()
+                .apply();
+    }
+
+    private SharedPreferences getUISharedPreferences() {
+        return getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
+    }
+
+    private void saveUISharedPreferences(boolean chronometerIsRunning, int time) {
+        getUISharedPreferences().edit()
+                .putBoolean(CHRONOMETER_IS_RUNNING, chronometerIsRunning)
+                .putInt(TIME_SELECTED, time)
+                .apply();
+    }
+
+    private int loadTimeSelected() {
+        return getUISharedPreferences().getInt(TIME_SELECTED, TWENTY);
     }
 
     private void setupToolbar() {
