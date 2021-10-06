@@ -16,9 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -54,17 +58,20 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection connection;
     private BroadcastReceiver receiver;
     private boolean bound = false;
-    private boolean receiverRegistered = false;
+    private LifecycleObserver lifecycleObserver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        setupReceiver();
+        lifecycleObserver = new MainActivityLifecycleObserver(this, receiver);
+        getLifecycle().addObserver(lifecycleObserver);
+
         setupViewModel();
         setupToolbar();
         setupChronometer();
-        setupReceiver();
-        registerReceiver();
         startService();
         setupServiceConnection();
         bindService();
@@ -281,6 +288,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupReceiver() {
+        Log.d(TAG, "setup");
+
         receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -306,37 +315,15 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private void registerReceiver() {
-        if (!receiverRegistered) {
-            receiverRegistered = true;
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(ACTION_TICK);
-            filter.addAction(ACTION_FINISH);
-            if (BuildConfig.DEBUG) {
-                filter.addAction(ACTION_5_SECONDS_TEST);
-            }
-            LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
-        }
-    }
-
-    private void unregisterReceiver() {
-        if (receiverRegistered) {
-            receiverRegistered = false;
-            LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(receiver);
-        }
-    }
-
     @Override
     protected void onStart() {
         super.onStart();
-        registerReceiver();
         bindService();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unregisterReceiver();
         unbindService();
     }
 
@@ -380,6 +367,65 @@ public class MainActivity extends AppCompatActivity {
     @VisibleForTesting
     public void destroyService() {
         stopForegroundService();
+    }
+
+
+    private static class MainActivityLifecycleObserver implements LifecycleObserver {
+        private final BroadcastReceiver receiver;
+        private final Context context;
+        private boolean receiverRegistered = false;
+        private IntentFilter receiverIntentFilter;
+
+        public MainActivityLifecycleObserver(@NonNull Context context, @NonNull BroadcastReceiver receiver) {
+            assert context != null : "Context is null";
+            assert receiver != null : "Receiver is null";
+
+            this.context = context;
+            this.receiver = receiver;
+            setupReceiverIntentFilter();
+        }
+
+        private void setupReceiverIntentFilter() {
+            receiverIntentFilter = new IntentFilter();
+            receiverIntentFilter.addAction(ACTION_TICK);
+            receiverIntentFilter.addAction(ACTION_FINISH);
+            if (BuildConfig.DEBUG) {
+                receiverIntentFilter.addAction(ACTION_5_SECONDS_TEST);
+            }
+        }
+
+        private void registerReceiver() {
+            if (!receiverRegistered) {
+                receiverRegistered = true;
+                LocalBroadcastManager.getInstance(context.getApplicationContext())
+                        .registerReceiver(receiver, receiverIntentFilter);
+            }
+        }
+
+        private void unregisterReceiver() {
+            if (receiverRegistered) {
+                receiverRegistered = false;
+                LocalBroadcastManager.getInstance(context.getApplicationContext())
+                        .unregisterReceiver(receiver);
+            }
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        public void connect() {
+            Log.d(TAG, "connect");
+            if (receiver == null) {
+                Log.d(TAG, "Receiver is null");
+            }
+            registerReceiver();
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        public void disconnect() {
+            Log.d(TAG, "disconnect");
+
+            unregisterReceiver();
+        }
+
     }
 
 }

@@ -52,6 +52,7 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
     implementation 'androidx.media:media:1.4.2'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     testImplementation 'junit:junit:4.13.2'
     testImplementation('org.mockito:mockito-core:3.11.2')
