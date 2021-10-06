@@ -5,9 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -16,15 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
@@ -354,63 +348,5 @@ public class MainActivity extends AppCompatActivity {
         stopForegroundService();
     }
 
-
-    private static class MainActivityLifecycleObserver implements LifecycleObserver {
-        private final BroadcastReceiver receiver;
-        private final Context context;
-        private boolean receiverRegistered = false;
-        private IntentFilter receiverIntentFilter;
-
-        public MainActivityLifecycleObserver(@NonNull Context context, @NonNull BroadcastReceiver receiver) {
-            assert context != null : "Context is null";
-            assert receiver != null : "Receiver is null";
-
-            this.context = context;
-            this.receiver = receiver;
-            setupReceiverIntentFilter();
-        }
-
-        private void setupReceiverIntentFilter() {
-            receiverIntentFilter = new IntentFilter();
-            receiverIntentFilter.addAction(ACTION_TICK);
-            receiverIntentFilter.addAction(ACTION_FINISH);
-            if (BuildConfig.DEBUG) {
-                receiverIntentFilter.addAction(ACTION_5_SECONDS_TEST);
-            }
-        }
-
-        private void registerReceiver() {
-            if (!receiverRegistered) {
-                receiverRegistered = true;
-                LocalBroadcastManager.getInstance(context.getApplicationContext())
-                        .registerReceiver(receiver, receiverIntentFilter);
-            }
-        }
-
-        private void unregisterReceiver() {
-            if (receiverRegistered) {
-                receiverRegistered = false;
-                LocalBroadcastManager.getInstance(context.getApplicationContext())
-                        .unregisterReceiver(receiver);
-            }
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        public void connect() {
-            Log.d(TAG, "connect");
-            if (receiver == null) {
-                Log.d(TAG, "Receiver is null");
-            }
-            registerReceiver();
-        }
-
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        public void disconnect() {
-            Log.d(TAG, "disconnect");
-
-            unregisterReceiver();
-        }
-
-    }
 
 }
