@@ -81,7 +81,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="366dp" />
 
-    <com.manuelsoft.mypomodoroapp.ui.main.MyChronometer
+    <com.manuelsoft.mypomodoroapp.ui.main.ChronometerView
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

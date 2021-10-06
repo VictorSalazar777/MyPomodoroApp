@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton fifteenMinutesBtn;
     private MaterialButton twentyMinutesBtn;
     private Toolbar toolbar;
-    private MyChronometer chronometerView;
+    private ChronometerView chronometerView;
     private MyChronometerService service;
     private ServiceConnection connection;
     private BroadcastReceiver receiver;

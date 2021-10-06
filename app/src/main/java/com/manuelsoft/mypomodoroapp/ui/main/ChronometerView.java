@@ -7,19 +7,19 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatTextView;
 
-public class MyChronometer extends AppCompatTextView {
+public class ChronometerView extends AppCompatTextView {
 
     private boolean isRunning = false;
 
-    public MyChronometer(@NonNull Context context) {
+    public ChronometerView(@NonNull Context context) {
         super(context);
     }
 
-    public MyChronometer(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public ChronometerView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyChronometer(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public ChronometerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

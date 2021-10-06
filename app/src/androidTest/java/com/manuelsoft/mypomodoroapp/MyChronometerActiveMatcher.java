@@ -1,12 +1,11 @@
 package com.manuelsoft.mypomodoroapp;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.Chronometer;
 
 import androidx.test.espresso.matcher.BoundedMatcher;
 
-import com.manuelsoft.mypomodoroapp.ui.main.MyChronometer;
+import com.manuelsoft.mypomodoroapp.ui.main.ChronometerView;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -44,7 +43,7 @@ public class MyChronometerActiveMatcher {
             throw new IllegalArgumentException("Null value");
         }
 
-        return new BoundedMatcher<>(MyChronometer.class) {
+        return new BoundedMatcher<>(ChronometerView.class) {
             @Override
             public void describeTo(Description description) {
                 description.appendText("with isTheFinalCountDown: ");
@@ -52,7 +51,7 @@ public class MyChronometerActiveMatcher {
             }
 
             @Override
-            protected boolean matchesSafely(MyChronometer item) {
+            protected boolean matchesSafely(ChronometerView item) {
                 return booleanMatcher.matches(item.isActive());
             }
         };
