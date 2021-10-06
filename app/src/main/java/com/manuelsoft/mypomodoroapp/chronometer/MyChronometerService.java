@@ -8,14 +8,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
-import com.manuelsoft.mypomodoroapp.R;
-import com.manuelsoft.mypomodoroapp.audio.AudioPlayer;
-import com.manuelsoft.mypomodoroapp.audio.VolumeContentObserver;
 
 
 public class MyChronometerService extends Service {
@@ -33,15 +28,15 @@ public class MyChronometerService extends Service {
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private Notification notification;
-    private AudioPlayer audioPlayer;
-    private VolumeContentObserver volumeContentObserver;
     private NotificationHelper notificationHelper;
+    private SoundHelper soundHelper;
 
     @Override
     public void onCreate() {
         super.onCreate();
         notificationHelper = new NotificationHelper(this);
-        setupAudio();
+        soundHelper = new SoundHelper(this);
+        soundHelper.setupAudio();
         notificationHelper.createNotificationChannel();
         notification = createNotification();
         myChronometerTask = new MyChronometerTask();
@@ -62,29 +57,6 @@ public class MyChronometerService extends Service {
         return notificationHelper.getNotificationBuilder().build();
     }
 
-    private void setupAudio() {
-        audioPlayer = new AudioPlayer();
-        audioPlayer.init();
-        audioPlayer.loadSound(this, R.raw.clock);
-        volumeContentObserver = new VolumeContentObserver(this, null,
-                volume -> audioPlayer.setVolume(volume));
-    }
-
-    private void registerVolumeContentObserver() {
-        getApplicationContext()
-                .getContentResolver()
-                .registerContentObserver(
-                        android.provider.Settings.System.CONTENT_URI,
-                        true,
-                        volumeContentObserver);
-    }
-
-    private void unregisterVolumeContentObserver() {
-        getApplicationContext()
-                .getContentResolver()
-                .unregisterContentObserver(volumeContentObserver);
-    }
-
     public void sendMessage(String action, String name, String message) {
         Intent intent = new Intent();
         intent.setAction(action);
@@ -93,7 +65,6 @@ public class MyChronometerService extends Service {
         }
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
-
 
     public class MyChronometerBinder extends Binder {
         public MyChronometerService getService() {
@@ -117,7 +88,7 @@ public class MyChronometerService extends Service {
             sendMessage(ACTION_FINISH, null, null);
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
-            unregisterVolumeContentObserver();
+            soundHelper.unregisterVolumeContentObserver();
             stopForeground(true);
         };
 
@@ -126,7 +97,7 @@ public class MyChronometerService extends Service {
 
     public void startChronometer() {
         startForeground(NOTIFICATION_SERVICE_ID, notification);
-        registerVolumeContentObserver();
+        soundHelper.registerVolumeContentObserver();
 //        handler.post(() -> {
 //            Log.d(TAG, Looper.myLooper().getThread().getName());
 //            myChronometerTask.execute();
@@ -139,7 +110,7 @@ public class MyChronometerService extends Service {
             Looper.loop();
         });
         thread.start();
-        audioPlayer.play(volumeContentObserver.getCurrentVolume());
+        soundHelper.play();
     }
 
     public void stopChronometer() {
@@ -147,11 +118,10 @@ public class MyChronometerService extends Service {
         chronometerHandler.post(myChronometerTask::cancel);
         chronometerHandler.getLooper().quit();
         // chronometerHandler.removeCallbacksAndMessages(null);
-        audioPlayer.stop();
-        unregisterVolumeContentObserver();
+        soundHelper.stop();
+        soundHelper.unregisterVolumeContentObserver();
         stopForeground(true);
     }
-
 
     public boolean chronometerIsActive() {
         return isRunning;
@@ -174,10 +144,9 @@ public class MyChronometerService extends Service {
             isRunning = false;
             chronometerHandler.getLooper().quit();
         }
-        audioPlayer.release();
-        getApplicationContext().getContentResolver().unregisterContentObserver(volumeContentObserver);
+        soundHelper.release();
+        soundHelper.unregisterVolumeContentObserver();
         super.onDestroy();
     }
-
 
 }
