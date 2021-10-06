@@ -2,12 +2,9 @@ package com.manuelsoft.mypomodoroapp.ui.main;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,13 +21,12 @@ import com.google.android.material.button.MaterialButton;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
-import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.TIME;
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.FIFTEEN;
@@ -48,12 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton twentyMinutesBtn;
     private Toolbar toolbar;
     private ChronometerView chronometerView;
-    private MyChronometerService service;
-    private ServiceConnection connection;
+
     private BroadcastReceiver receiver;
-    private boolean bound = false;
     private LifecycleObserver lifecycleObserver;
     private UISharedPreferences uiSharedPreferences;
+    private ChronometerServiceAccessor chronometerServiceAccessor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,13 +59,11 @@ public class MainActivity extends AppCompatActivity {
         lifecycleObserver = new MainActivityLifecycleObserver(this, receiver);
         getLifecycle().addObserver(lifecycleObserver);
         uiSharedPreferences = new UISharedPreferences(this);
+        chronometerServiceAccessor = new ChronometerServiceAccessor(this);
 
         setupViewModel();
         setupToolbar();
         setupChronometer();
-        startService();
-        setupServiceConnection();
-        bindService();
         setupStartStopBtn();
         setupFifteenMinutesBtn();
         setupTwentyMinutesBtn();
@@ -188,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 fifteenMinutesBtn.setEnabled(true);
                 twentyMinutesBtn.setEnabled(true);
-                stopChronometer();
+                chronometerServiceAccessor.stopChronometer();
             } else {
                 mainActivityViewModel.setStateActive();
                 chronometerView.setActive(true);
@@ -198,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                 startStopBtn.setText(R.string.txt_btn_stop);
                 fifteenMinutesBtn.setEnabled(false);
                 twentyMinutesBtn.setEnabled(false);
-                startChronometer();
+                chronometerServiceAccessor.startChronometer(mainActivityViewModel.getHowManyMinutes());
             }
         });
     }
@@ -208,60 +201,6 @@ public class MainActivity extends AppCompatActivity {
         String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
         chronometerView.setText(minutes);
         chronometerView.setActive(mainActivityViewModel.isActive());
-    }
-
-    private void startChronometer() {
-        if (bound) {
-            service.setChronometer(mainActivityViewModel.getHowManyMinutes());
-            service.startChronometer();
-        }
-        Log.d(TAG, "Sending message");
-        Log.d(TAG, "service running: " + Utilities.isServiceRunning(this, MyChronometerService.class));
-    }
-
-    private void stopChronometer() {
-        if (bound) {
-            service.stopChronometer();
-        }
-    }
-
-    private void startService() {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
-        startService(intent);
-    }
-
-    private void stopForegroundService() {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
-        stopService(intent);
-    }
-
-    private void setupServiceConnection() {
-        connection = new ServiceConnection() {
-
-            @Override
-            public void onServiceConnected(ComponentName className, IBinder service) {
-                bound = true;
-                MyChronometerBinder binder = (MyChronometerBinder) service;
-                MainActivity.this.service = binder.getService();
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName arg0) {
-                bound = false;
-            }
-        };
-    }
-
-    private void bindService() {
-        Intent intent = new Intent(getApplicationContext(), MyChronometerService.class);
-        bindService(intent, connection, Context.BIND_AUTO_CREATE);
-    }
-
-    private void unbindService() {
-        if (bound) {
-            unbindService(connection);
-            bound = false;
-        }
     }
 
     private void setupReceiver() {
@@ -297,13 +236,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        bindService();
+        chronometerServiceAccessor.bindService();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService();
+        chronometerServiceAccessor.unbindService();
     }
 
     private void onFinishPomodoro() {
@@ -333,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Click on button test 5 sec");
             mainActivityViewModel.setStateActive();
             chronometerView.setActive(true);
-            service.sendOneTick();
+            chronometerServiceAccessor.sendOneTick();
         });
     }
 
@@ -345,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public void destroyService() {
-        stopForegroundService();
+        chronometerServiceAccessor.stopForegroundService();
     }
 
 
