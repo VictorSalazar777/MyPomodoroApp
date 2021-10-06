@@ -1,13 +1,9 @@
 package com.manuelsoft.mypomodoroapp.chronometer;
 
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
@@ -15,15 +11,11 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.audio.AudioPlayer;
 import com.manuelsoft.mypomodoroapp.audio.VolumeContentObserver;
-import com.manuelsoft.mypomodoroapp.ui.main.MainActivity;
-
-import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
 
 
 public class MyChronometerService extends Service {
@@ -43,12 +35,14 @@ public class MyChronometerService extends Service {
     private Notification notification;
     private AudioPlayer audioPlayer;
     private VolumeContentObserver volumeContentObserver;
+    private NotificationHelper notificationHelper;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        notificationHelper = new NotificationHelper(this);
         setupAudio();
-        createNotificationChannel();
+        notificationHelper.createNotificationChannel();
         notification = createNotification();
         myChronometerTask = new MyChronometerTask();
     }
@@ -65,7 +59,7 @@ public class MyChronometerService extends Service {
     }
 
     private Notification createNotification() {
-        return getNotificationBuilder().build();
+        return notificationHelper.getNotificationBuilder().build();
     }
 
     private void setupAudio() {
@@ -89,41 +83,6 @@ public class MyChronometerService extends Service {
         getApplicationContext()
                 .getContentResolver()
                 .unregisterContentObserver(volumeContentObserver);
-    }
-
-    private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = getString(R.string.channel_name);
-            String description = getString(R.string.channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel channel = new NotificationChannel(POMODORO_CHANNEL_ID, name, importance);
-            channel.setDescription(description);
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
-        }
-    }
-
-    private NotificationCompat.Builder getNotificationBuilder() {
-        return new NotificationCompat.Builder(this, POMODORO_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Pomodoro is running!")
-                .setContentText("text")
-                .setSubText("Pomodoro is running!")
-                //.setTicker() //TODO: Implement this for accessibility
-                .setContentIntent(getPendingIntent())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-    }
-
-    private PendingIntent getPendingIntent() {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                FLAG_UPDATE_CURRENT
-        );
     }
 
     public void sendMessage(String action, String name, String message) {
