@@ -1,5 +1,6 @@
 package com.manuelsoft.mypomodoroapp.chronometer;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,7 +14,7 @@ import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.ui.main.MainActivity;
 
 import static android.app.PendingIntent.FLAG_UPDATE_CURRENT;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.POMODORO_CHANNEL_ID;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.POMODORO_CHANNEL_ID;
 
 class NotificationHelper {
 
@@ -56,6 +57,10 @@ class NotificationHelper {
                 intent,
                 FLAG_UPDATE_CURRENT
         );
+    }
+
+    public Notification createNotification() {
+        return getNotificationBuilder().build();
     }
 
 }

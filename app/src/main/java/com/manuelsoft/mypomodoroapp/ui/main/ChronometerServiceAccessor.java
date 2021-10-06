@@ -7,15 +7,15 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 import androidx.annotation.VisibleForTesting;
-import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
-import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
+import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
+import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ChronometerBinder;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 
 class ChronometerServiceAccessor {
     private final Context context;
     private boolean bound = false;
     private ServiceConnection connection;
-    private MyChronometerService service;
+    private ChronometerService service;
     public static final String TAG = ChronometerServiceAccessor.class.getName();
 
 
@@ -27,13 +27,13 @@ class ChronometerServiceAccessor {
     }
 
     public void startService() {
-        Intent intent = new Intent(context.getApplicationContext(), MyChronometerService.class);
+        Intent intent = new Intent(context.getApplicationContext(), ChronometerService.class);
         context.startService(intent);
     }
 
     @VisibleForTesting
     public void stopForegroundService() {
-        Intent intent = new Intent(context.getApplicationContext(), MyChronometerService.class);
+        Intent intent = new Intent(context.getApplicationContext(), ChronometerService.class);
         context.stopService(intent);
     }
 
@@ -43,7 +43,7 @@ class ChronometerServiceAccessor {
             @Override
             public void onServiceConnected(ComponentName className, IBinder service) {
                 bound = true;
-                MyChronometerBinder binder = (MyChronometerBinder) service;
+                ChronometerBinder binder = (ChronometerBinder) service;
                 ChronometerServiceAccessor.this.service = binder.getService();
             }
 
@@ -55,7 +55,7 @@ class ChronometerServiceAccessor {
     }
 
     public void bindService() {
-        Intent intent = new Intent(context.getApplicationContext(), MyChronometerService.class);
+        Intent intent = new Intent(context.getApplicationContext(), ChronometerService.class);
         context.bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
@@ -72,7 +72,7 @@ class ChronometerServiceAccessor {
             service.startChronometer();
         }
         Log.d(TAG, "Sending message");
-        Log.d(TAG, "service running: " + Utilities.isServiceRunning(context, MyChronometerService.class));
+        Log.d(TAG, "service running: " + Utilities.isServiceRunning(context, ChronometerService.class));
     }
 
     public void stopChronometer() {

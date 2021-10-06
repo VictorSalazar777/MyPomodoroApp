@@ -2,21 +2,21 @@ package com.manuelsoft.mypomodoroapp.chronometer;
 
 import android.os.CountDownTimer;
 
-interface MyTask {
+interface ChronometerTask {
     void execute(int minutes, int seconds, long counter);
 }
 
-public class MyChronometerTask {
+public class ChronometerTimer {
 
     private int minutes = 0;
     private int seconds = -1;
     private long counter = 0L;
-    private MyTask myTask;
-    private MyTask end;
+    private ChronometerTask myTask;
+    private ChronometerTask end;
     private CountDownTimer myCountDownTimer;
     private boolean isRunning = false;
 
-    public void set(int minutes, MyTask myTask, MyTask end) {
+    public void set(int minutes, ChronometerTask myTask, ChronometerTask end) {
         this.minutes = minutes;
         this.myTask = myTask;
         this.end = end;

@@ -27,7 +27,7 @@
         </activity>
         <activity android:name=".ui.credits.CreditsActivity" />
 
-        <service android:name=".chronometer.MyChronometerService"/>
+        <service android:name=".chronometer.ChronometerService"/>
     </application>
 
 </manifest>

@@ -8,9 +8,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_5_SECONDS_TEST;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
 
 class ReceiverAccessor {
     private BroadcastReceiver receiver;

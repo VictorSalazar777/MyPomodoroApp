@@ -17,15 +17,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.R;
-import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
+import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_5_SECONDS_TEST;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.TIME;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.TIME;
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.FIFTEEN;
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.TWENTY;
 
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isChronometerServiceInTheForeground() {
-        boolean result = Utilities.isForegroundServiceRunning(this, MyChronometerService.class);
+        boolean result = Utilities.isForegroundServiceRunning(this, ChronometerService.class);
         Log.d(TAG, "isChronometerServiceInTheForeground(): " + result);
         return result;
     }
