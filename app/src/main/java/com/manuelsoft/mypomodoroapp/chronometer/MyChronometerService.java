@@ -37,7 +37,7 @@ public class MyChronometerService extends Service {
     public static final String VENDOR = "com.manuelsoft.mypomodoroapp.";
     public static final String ACTION_TICK = VENDOR + "tick";
     public static final String ACTION_FINISH = VENDOR + ".finish";
-    public static final String ACTION_TEST = VENDOR + "test";
+    public static final String ACTION_5_SECONDS_TEST = VENDOR + "test";
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private NotificationCompat.Builder notificationBuilder;
@@ -207,7 +207,7 @@ public class MyChronometerService extends Service {
             @Override
             public void run() {
                 Log.d(TAG, "Sending ACTION_TEST");
-                sendMessage(ACTION_TEST, null, null);
+                sendMessage(ACTION_5_SECONDS_TEST, null, null);
             }
         }.start();
     }

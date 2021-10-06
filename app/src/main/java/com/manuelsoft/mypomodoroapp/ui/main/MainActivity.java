@@ -24,14 +24,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
+import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
-import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
+import static android.view.Menu.NONE;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
-import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_5_SECONDS_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.TIME;
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.FIFTEEN;
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
         setupStartStopBtn();
         setupFifteenMinutesBtn();
         setupTwentyMinutesBtn();
-        setupTestButton();
     }
 
     private SharedPreferences getUISharedPreferences() {
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         getUISharedPreferences().edit()
                 .putBoolean(CHRONOMETER_IS_RUNNING, chronometerIsRunning)
                 .putInt(TIME_SELECTED, time)
-        .apply();
+                .apply();
     }
 
     private boolean loadChronometerIsRunning() {
@@ -124,7 +124,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_credits, menu);
+        createTest5SecondsItem(menu);
         return true;
+    }
+
+    private void createTest5SecondsItem(Menu menu) {
+        if (BuildConfig.DEBUG) {
+            menu.add(NONE, R.id.menu_item_5_sec, NONE, R.string.menu_item_test_5_sec);
+            menu.add(NONE, R.id.menu_item_reset_tests, NONE, R.string.menu_item_reset_tests);
+        }
     }
 
     @Override
@@ -132,8 +140,12 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.item_credits) {
             Log.d(TAG, "Credits");
             Intent intent = new Intent(this, CreditsActivity.class);
-              //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+        } else if (item.getItemId() == R.id.menu_item_5_sec) {
+            setupTestButton();
+        } else {
+            resetTests();
         }
 
         return super.onOptionsItemSelected(item);
@@ -281,9 +293,9 @@ public class MainActivity extends AppCompatActivity {
                         showFinishPomodoroDialog();
                         saveUISharedPreferences(false, mainActivityViewModel.getHowManyMinutes());
                         break;
-                    case ACTION_TEST:
+                    case ACTION_5_SECONDS_TEST:
                         if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "ACTION TEST received");
+                            Log.d(TAG, "ACTION 5 SECONDS TEST received");
                             showFinishPomodoroDialog();
                         }
                         break;
@@ -301,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
             filter.addAction(ACTION_TICK);
             filter.addAction(ACTION_FINISH);
             if (BuildConfig.DEBUG) {
-                filter.addAction(ACTION_TEST);
+                filter.addAction(ACTION_5_SECONDS_TEST);
             }
             LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(receiver, filter);
         }
@@ -349,16 +361,20 @@ public class MainActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public void setupTestButton() {
-        if (BuildConfig.DEBUG) {
-            Button testBtn = findViewById(R.id.btn_test);
-            testBtn.setVisibility(View.VISIBLE);
-            testBtn.setOnClickListener(v -> {
-                Log.d(TAG, "Click on button Test");
-                mainActivityViewModel.setStateActive();
-                chronometerView.setActive(true);
-                service.sendOneTick();
-            });
-        }
+        Button testBtn = findViewById(R.id.btn_test);
+        testBtn.setVisibility(View.VISIBLE);
+        testBtn.setOnClickListener(v -> {
+            Log.d(TAG, "Click on button test 5 sec");
+            mainActivityViewModel.setStateActive();
+            chronometerView.setActive(true);
+            service.sendOneTick();
+        });
+    }
+
+    @VisibleForTesting
+    private void resetTests() {
+        Button testBtn = findViewById(R.id.btn_test);
+        testBtn.setVisibility(View.GONE);
     }
 
     @VisibleForTesting

@@ -13,4 +13,6 @@
     <string name="txt_menu_item_credits">Credits</string>
     <string name="txt_author_credits">Author: Manuel Salazar, using Android framework.</string>
     <string name="txt_clock_sound_credits">Clock sound provided by: Pogotron, https://freesound.org/people/Pogotron/sounds/60811/ under license https://creativecommons.org/licenses/sampling+/1.0/</string>
+    <string name="menu_item_test_5_sec">Test 5 seconds</string>
+    <string name="menu_item_reset_tests">Reset tests</string>
 </resources>
