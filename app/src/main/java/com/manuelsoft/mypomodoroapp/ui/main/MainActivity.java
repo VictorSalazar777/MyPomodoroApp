@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver receiver;
     private boolean bound = false;
     private LifecycleObserver lifecycleObserver;
+    private UISharedPreferences uiSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
         setupReceiver();
         lifecycleObserver = new MainActivityLifecycleObserver(this, receiver);
         getLifecycle().addObserver(lifecycleObserver);
+        uiSharedPreferences = new UISharedPreferences(this);
 
         setupViewModel();
         setupToolbar();
@@ -80,36 +82,15 @@ public class MainActivity extends AppCompatActivity {
         setupTwentyMinutesBtn();
     }
 
-    private SharedPreferences getUISharedPreferences() {
-        return getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
-    }
-
-    private void saveUISharedPreferences(boolean chronometerIsRunning, int time) {
-        getUISharedPreferences().edit()
-                .putBoolean(CHRONOMETER_IS_RUNNING, chronometerIsRunning)
-                .putInt(TIME_SELECTED, time)
-                .apply();
-    }
-
-    private boolean loadChronometerIsRunning() {
-        boolean result = getUISharedPreferences().getBoolean(CHRONOMETER_IS_RUNNING, false);
-        Log.d(TAG, "loadChronometerIsRunning(): " + result);
-        return result;
-    }
-
-    private int loadTimeSelected() {
-        return getUISharedPreferences().getInt(TIME_SELECTED, TWENTY);
-    }
-
     private void setupViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        if (loadChronometerIsRunning() && isChronometerServiceInTheForeground()) {
+        if (uiSharedPreferences.loadChronometerIsRunning() && isChronometerServiceInTheForeground()) {
             mainActivityViewModel.setStateActive();
         } else {
             mainActivityViewModel.setStateInactive();
         }
 
-        if (loadTimeSelected() == FIFTEEN) {
+        if (uiSharedPreferences.loadTimeSelected() == FIFTEEN) {
             mainActivityViewModel.setFifteenMinutes();
         } else {
             mainActivityViewModel.setTwentyMinutes();
@@ -206,10 +187,10 @@ public class MainActivity extends AppCompatActivity {
                 startStopBtn.setText(R.string.txt_btn_start);
                 if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
                     chronometerView.setText(R.string.txt_twenty_minutes);
-                    saveUISharedPreferences(false, TWENTY);
+                    uiSharedPreferences.saveUISharedPreferences(false, TWENTY);
                 } else {
                     chronometerView.setText(R.string.txt_fifteen_minutes);
-                    saveUISharedPreferences(false, FIFTEEN);
+                    uiSharedPreferences.saveUISharedPreferences(false, FIFTEEN);
                 }
                 fifteenMinutesBtn.setEnabled(true);
                 twentyMinutesBtn.setEnabled(true);
@@ -217,7 +198,9 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 mainActivityViewModel.setStateActive();
                 chronometerView.setActive(true);
-                saveUISharedPreferences(true, mainActivityViewModel.getHowManyMinutes());
+                uiSharedPreferences
+                        .saveUISharedPreferences(true,
+                                mainActivityViewModel.getHowManyMinutes());
                 startStopBtn.setText(R.string.txt_btn_stop);
                 fifteenMinutesBtn.setEnabled(false);
                 twentyMinutesBtn.setEnabled(false);
@@ -300,7 +283,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case ACTION_FINISH:
                         showFinishPomodoroDialog();
-                        saveUISharedPreferences(false, mainActivityViewModel.getHowManyMinutes());
+                        uiSharedPreferences
+                                .saveUISharedPreferences(false,
+                                        mainActivityViewModel.getHowManyMinutes());
                         break;
                     case ACTION_5_SECONDS_TEST:
                         if (BuildConfig.DEBUG) {
