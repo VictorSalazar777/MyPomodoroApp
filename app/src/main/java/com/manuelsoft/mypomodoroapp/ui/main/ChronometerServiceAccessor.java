@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
-
 import androidx.annotation.VisibleForTesting;
-
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
 import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.MyChronometerBinder;
 import com.manuelsoft.mypomodoroapp.common.Utilities;

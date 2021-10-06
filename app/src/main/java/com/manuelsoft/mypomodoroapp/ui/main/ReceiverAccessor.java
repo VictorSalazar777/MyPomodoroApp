@@ -2,34 +2,34 @@ package com.manuelsoft.mypomodoroapp.ui.main;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.manuelsoft.mypomodoroapp.BuildConfig;
-
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_5_SECONDS_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService.ACTION_TICK;
 
-class MainActivityLifecycleObserver implements LifecycleObserver {
-    private final BroadcastReceiver receiver;
+class ReceiverAccessor {
+    private BroadcastReceiver receiver;
     private final Context context;
     private boolean receiverRegistered = false;
     private IntentFilter receiverIntentFilter;
+    public interface OnReceive {
+        void run(Context context, Intent intent);
+    }
+    private final OnReceive onReceive;
 
-    public MainActivityLifecycleObserver(@NonNull Context context, @NonNull BroadcastReceiver receiver) {
+    public ReceiverAccessor(@NonNull Context context, @NonNull OnReceive onReceive) {
         assert context != null : "Context is null";
-        assert receiver != null : "Receiver is null";
+        assert onReceive != null : "Receiver is null";
 
         this.context = context;
-        this.receiver = receiver;
+        this.onReceive = onReceive;
         setupReceiverIntentFilter();
+        createReceiver();
     }
 
     private void setupReceiverIntentFilter() {
@@ -40,6 +40,16 @@ class MainActivityLifecycleObserver implements LifecycleObserver {
             receiverIntentFilter.addAction(ACTION_5_SECONDS_TEST);
         }
     }
+
+    private void createReceiver() {
+        receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                onReceive.run(context, intent);
+            }
+        };
+    }
+
 
     private void registerReceiver() {
         if (!receiverRegistered) {
@@ -57,7 +67,6 @@ class MainActivityLifecycleObserver implements LifecycleObserver {
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void connect() {
         Log.d(MainActivity.TAG, "connect");
         if (receiver == null) {
@@ -66,7 +75,6 @@ class MainActivityLifecycleObserver implements LifecycleObserver {
         registerReceiver();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     public void disconnect() {
         Log.d(MainActivity.TAG, "disconnect");
 

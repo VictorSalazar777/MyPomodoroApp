@@ -1,8 +1,6 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,7 +12,6 @@ import android.widget.Button;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
@@ -44,9 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton twentyMinutesBtn;
     private Toolbar toolbar;
     private ChronometerView chronometerView;
-
-    private BroadcastReceiver receiver;
-    private LifecycleObserver lifecycleObserver;
+    private ReceiverAccessor receiverAccessor;
     private UISharedPreferences uiSharedPreferences;
     private ChronometerServiceAccessor chronometerServiceAccessor;
 
@@ -56,8 +51,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setupReceiver();
-        lifecycleObserver = new MainActivityLifecycleObserver(this, receiver);
-        getLifecycle().addObserver(lifecycleObserver);
         uiSharedPreferences = new UISharedPreferences(this);
         chronometerServiceAccessor = new ChronometerServiceAccessor(this);
 
@@ -204,45 +197,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupReceiver() {
-        Log.d(TAG, "setup");
-
-        receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                switch (intent.getAction()) {
-                    case ACTION_TICK:
-                        String time = intent.getStringExtra(TIME);
-                        chronometerView.setText(time);
-                        break;
-                    case ACTION_FINISH:
+        ReceiverAccessor.OnReceive onReceive = (context, intent) -> {
+            switch (intent.getAction()) {
+                case ACTION_TICK:
+                    String time = intent.getStringExtra(TIME);
+                    chronometerView.setText(time);
+                    break;
+                case ACTION_FINISH:
+                    showFinishPomodoroDialog();
+                    uiSharedPreferences
+                            .saveUISharedPreferences(false,
+                                    mainActivityViewModel.getHowManyMinutes());
+                    break;
+                case ACTION_5_SECONDS_TEST:
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "ACTION 5 SECONDS TEST received");
                         showFinishPomodoroDialog();
-                        uiSharedPreferences
-                                .saveUISharedPreferences(false,
-                                        mainActivityViewModel.getHowManyMinutes());
-                        break;
-                    case ACTION_5_SECONDS_TEST:
-                        if (BuildConfig.DEBUG) {
-                            Log.d(TAG, "ACTION 5 SECONDS TEST received");
-                            showFinishPomodoroDialog();
-                        }
-                        break;
-                    default:
-                        throw new RuntimeException("Receiver: unknown option");
-                }
+                    }
+                    break;
+                default:
+                    throw new RuntimeException("Receiver: unknown option");
             }
         };
-    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        chronometerServiceAccessor.bindService();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        chronometerServiceAccessor.unbindService();
+        receiverAccessor = new ReceiverAccessor(this, onReceive);
     }
 
     private void onFinishPomodoro() {
@@ -287,5 +265,17 @@ public class MainActivity extends AppCompatActivity {
         chronometerServiceAccessor.stopForegroundService();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        receiverAccessor.connect();
+        chronometerServiceAccessor.bindService();
+    }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        receiverAccessor.disconnect();
+        chronometerServiceAccessor.unbindService();
+    }
 }
