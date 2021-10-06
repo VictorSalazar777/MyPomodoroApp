@@ -40,7 +40,6 @@ public class MyChronometerService extends Service {
     public static final String ACTION_5_SECONDS_TEST = VENDOR + "test";
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
-    private NotificationCompat.Builder notificationBuilder;
     private Notification notification;
     private AudioPlayer audioPlayer;
     private VolumeContentObserver volumeContentObserver;
@@ -49,6 +48,7 @@ public class MyChronometerService extends Service {
     public void onCreate() {
         super.onCreate();
         setupAudio();
+        createNotificationChannel();
         notification = createNotification();
         myChronometerTask = new MyChronometerTask();
     }
@@ -65,9 +65,7 @@ public class MyChronometerService extends Service {
     }
 
     private Notification createNotification() {
-        createChannel();
-        notificationBuilder = getNotificationBuilder();
-        return notificationBuilder.build();
+        return getNotificationBuilder().build();
     }
 
     private void setupAudio() {
@@ -93,7 +91,7 @@ public class MyChronometerService extends Service {
                 .unregisterContentObserver(volumeContentObserver);
     }
 
-    private void createChannel() {
+    private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = getString(R.string.channel_name);
             String description = getString(R.string.channel_description);
@@ -139,7 +137,6 @@ public class MyChronometerService extends Service {
 
 
     public class MyChronometerBinder extends Binder {
-
         public MyChronometerService getService() {
             return MyChronometerService.this;
         }
