@@ -4,22 +4,15 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 
 public class ChronometerService extends Service {
 
-    private final IBinder binder = new ChronometerBinder();
-    private ChronometerTimer chronometerTimer;
-    private Handler chronometerHandler;
-    private boolean isRunning = false;
     private final String TAG = ChronometerService.class.getName();
+    private final IBinder binder = new ChronometerBinder();
     public static final String TIME = "time";
     public static final String VENDOR = "com.manuelsoft.mypomodoroapp.";
     public static final String ACTION_TICK = VENDOR + "tick";
@@ -28,7 +21,7 @@ public class ChronometerService extends Service {
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private Notification notification;
-    private SoundHelper soundHelper;
+    private ChronometerManager chronometerManager;
 
     @Override
     public void onCreate() {
@@ -36,8 +29,7 @@ public class ChronometerService extends Service {
         NotificationHelper notificationHelper = new NotificationHelper(this);
         notificationHelper.createNotificationChannel();
         notification = notificationHelper.createNotification();
-        soundHelper = new SoundHelper(this);
-        chronometerTimer = new ChronometerTimer();
+        chronometerManager = new ChronometerManager(this);
     }
 
     @Nullable
@@ -51,19 +43,6 @@ public class ChronometerService extends Service {
         return START_STICKY;
     }
 
-    public void sendMessage(String action, String name, String message) {
-        Intent intent = new Intent();
-        intent.setAction(action);
-        if (name != null) {
-            intent.putExtra(name, message);
-        }
-        sendLocalBroadcast(intent);
-    }
-
-    private void sendLocalBroadcast(Intent intent) {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-    }
-
     public class ChronometerBinder extends Binder {
         public ChronometerService getService() {
             return ChronometerService.this;
@@ -75,72 +54,31 @@ public class ChronometerService extends Service {
     }
 
     public void setChronometer(int pomodoroMinutes) {
-
-        ChronometerTask task = (minutes, seconds, counter) -> {
-            String time = chronometerTimer.print(minutes, seconds);
-            sendMessage(ACTION_TICK, TIME, time);
-        };
-
-        ChronometerTask end = (minutes, seconds, counter) -> {
-            isRunning = false;
-            sendMessage(ACTION_FINISH, null, null);
-            chronometerHandler.getLooper().quit();
-            // chronometerHandler.removeCallbacksAndMessages(null);
-            soundHelper.stop();
-            stopForeground(true);
-        };
-
-        chronometerTimer.set(pomodoroMinutes, task, end);
+        chronometerManager.setChronometer(pomodoroMinutes);
     }
 
     public void startChronometer() {
         startForeground(NOTIFICATION_SERVICE_ID, notification);
-//        handler.post(() -> {
-//            Log.d(TAG, Looper.myLooper().getThread().getName());
-//            chronometerTask.execute();
-//        });
-        isRunning = true;
-        Thread thread = new Thread(() -> {
-            Looper.prepare();
-            chronometerHandler = new Handler(Looper.myLooper());
-            chronometerTimer.execute();
-            Looper.loop();
-        });
-        thread.start();
-        soundHelper.play();
+        chronometerManager.startChronometer();
     }
 
     public void stopChronometer() {
-        isRunning = false;
-        chronometerHandler.post(chronometerTimer::cancel);
-        chronometerHandler.getLooper().quit();
-        // chronometerHandler.removeCallbacksAndMessages(null);
-        soundHelper.stop();
+        chronometerManager.stopChronometer();
         stopForeground(true);
     }
 
     public boolean chronometerIsActive() {
-        return isRunning;
+        return chronometerManager.chronometerIsActive();
     }
 
     @VisibleForTesting
     public void sendOneTick() {
-        new Thread() {
-            @Override
-            public void run() {
-                Log.d(TAG, "Sending ACTION_TEST");
-                sendMessage(ACTION_5_SECONDS_TEST, null, null);
-            }
-        }.start();
+        chronometerManager.sendOneTick();
     }
 
     @Override
     public void onDestroy() {
-        if (isRunning) {
-            isRunning = false;
-            chronometerHandler.getLooper().quit();
-        }
-        soundHelper.release();
+        chronometerManager.onDestroy();
         super.onDestroy();
     }
 
