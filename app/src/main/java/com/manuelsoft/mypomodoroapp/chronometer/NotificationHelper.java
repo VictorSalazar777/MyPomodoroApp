@@ -26,8 +26,8 @@ class NotificationHelper {
 
     public void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = context.getString(R.string.channel_name);
-            String description = context.getString(R.string.channel_description);
+            CharSequence name = context.getString(R.string.txt_channel_name);
+            String description = context.getString(R.string.txt_channel_description);
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(POMODORO_CHANNEL_ID, name, importance);
             channel.setDescription(description);

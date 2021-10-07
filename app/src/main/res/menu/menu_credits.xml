@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 <item
-    android:id="@+id/item_credits"
+    android:id="@+id/menu_item_credits"
     android:title="@string/txt_menu_item_credits"
     app:showAsAction = "never"/>
 

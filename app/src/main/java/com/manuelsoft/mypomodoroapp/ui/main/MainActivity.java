@@ -92,20 +92,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_credits, menu);
-        createTest5SecondsItem(menu);
+        createDebugMenuItems(menu);
         return true;
     }
 
-    private void createTest5SecondsItem(Menu menu) {
+    private void createDebugMenuItems(Menu menu) {
         if (BuildConfig.DEBUG) {
-            menu.add(NONE, R.id.menu_item_5_sec, NONE, R.string.menu_item_test_5_sec);
-            menu.add(NONE, R.id.menu_item_reset_tests, NONE, R.string.menu_item_reset_tests);
+            menu.add(NONE, R.id.menu_item_one_tick_test, NONE, R.string.txt_menu_item_one_tick_test);
+            menu.add(NONE, R.id.menu_item_5_sec, NONE, R.string.txt_menu_item_5_sec_test);
+            menu.add(NONE, R.id.menu_item_reset_tests, NONE, R.string.txt_menu_item_reset_tests);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.item_credits) {
+        if (item.getItemId() == R.id.menu_item_credits) {
             Log.d(TAG, "Credits");
             Intent intent = new Intent(this, CreditsActivity.class);
             //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
