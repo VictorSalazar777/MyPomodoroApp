@@ -17,9 +17,10 @@ class SoundHelper {
     SoundHelper(@NonNull Context context) {
         assert context != null : "Context is null";
         this.context = context;
+        setupAudio();
     }
 
-    public void setupAudio() {
+    private void setupAudio() {
         audioPlayer = new AudioPlayer();
         audioPlayer.init();
         audioPlayer.loadSound(context, R.raw.clock);
@@ -27,7 +28,7 @@ class SoundHelper {
                 volume -> audioPlayer.setVolume(volume));
     }
 
-    public void registerVolumeContentObserver() {
+    private void registerVolumeContentObserver() {
         context.getApplicationContext()
                 .getContentResolver()
                 .registerContentObserver(
@@ -36,21 +37,24 @@ class SoundHelper {
                         volumeContentObserver);
     }
 
-    public void unregisterVolumeContentObserver() {
+    private void unregisterVolumeContentObserver() {
         context.getApplicationContext()
                 .getContentResolver()
                 .unregisterContentObserver(volumeContentObserver);
     }
 
     public void play() {
+        registerVolumeContentObserver();
         audioPlayer.play(volumeContentObserver.getCurrentVolume());
     }
 
     public void stop() {
         audioPlayer.stop();
+        unregisterVolumeContentObserver();
     }
 
     public void release() {
         audioPlayer.release();
+        unregisterVolumeContentObserver();
     }
 }

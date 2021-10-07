@@ -37,7 +37,6 @@ public class ChronometerService extends Service {
         notificationHelper.createNotificationChannel();
         notification = notificationHelper.createNotification();
         soundHelper = new SoundHelper(this);
-        soundHelper.setupAudio();
         chronometerTimer = new ChronometerTimer();
     }
 
@@ -88,7 +87,6 @@ public class ChronometerService extends Service {
             chronometerHandler.getLooper().quit();
             // chronometerHandler.removeCallbacksAndMessages(null);
             soundHelper.stop();
-            soundHelper.unregisterVolumeContentObserver();
             stopForeground(true);
         };
 
@@ -97,7 +95,6 @@ public class ChronometerService extends Service {
 
     public void startChronometer() {
         startForeground(NOTIFICATION_SERVICE_ID, notification);
-        soundHelper.registerVolumeContentObserver();
 //        handler.post(() -> {
 //            Log.d(TAG, Looper.myLooper().getThread().getName());
 //            chronometerTask.execute();
@@ -119,7 +116,6 @@ public class ChronometerService extends Service {
         chronometerHandler.getLooper().quit();
         // chronometerHandler.removeCallbacksAndMessages(null);
         soundHelper.stop();
-        soundHelper.unregisterVolumeContentObserver();
         stopForeground(true);
     }
 
@@ -145,7 +141,6 @@ public class ChronometerService extends Service {
             chronometerHandler.getLooper().quit();
         }
         soundHelper.release();
-        soundHelper.unregisterVolumeContentObserver();
         super.onDestroy();
     }
 
