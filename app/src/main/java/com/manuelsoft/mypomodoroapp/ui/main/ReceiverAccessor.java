@@ -8,7 +8,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
-import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
 
@@ -37,7 +37,7 @@ class ReceiverAccessor {
         receiverIntentFilter.addAction(ACTION_TICK);
         receiverIntentFilter.addAction(ACTION_FINISH);
         if (BuildConfig.DEBUG) {
-            receiverIntentFilter.addAction(ACTION_5_SECONDS_TEST);
+            receiverIntentFilter.addAction(ACTION_ONE_TICK_TEST);
         }
     }
 

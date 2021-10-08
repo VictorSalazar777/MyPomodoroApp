@@ -17,7 +17,7 @@ public class ChronometerService extends Service {
     public static final String VENDOR = "com.manuelsoft.mypomodoroapp.";
     public static final String ACTION_TICK = VENDOR + "tick";
     public static final String ACTION_FINISH = VENDOR + ".finish";
-    public static final String ACTION_5_SECONDS_TEST = VENDOR + "test";
+    public static final String ACTION_ONE_TICK_TEST = VENDOR + "test";
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private Notification notification;

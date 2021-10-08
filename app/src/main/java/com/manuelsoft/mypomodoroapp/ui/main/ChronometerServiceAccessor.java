@@ -88,4 +88,7 @@ class ChronometerServiceAccessor {
         }
     }
 
+    public void start5secCount() {
+
+    }
 }

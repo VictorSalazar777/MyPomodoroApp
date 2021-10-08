@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.TIME;
@@ -101,7 +101,7 @@ class ChronometerManager {
         new Thread() {
             @Override
             public void run() {
-                sendMessage(ACTION_5_SECONDS_TEST, null, null);
+                sendMessage(ACTION_ONE_TICK_TEST, null, null);
             }
         }.start();
     }

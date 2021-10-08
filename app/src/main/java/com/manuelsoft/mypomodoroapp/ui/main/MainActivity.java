@@ -22,7 +22,7 @@ import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
-import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SECONDS_TEST;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.TIME;
@@ -111,10 +111,13 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, CreditsActivity.class);
             //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-        } else if (item.getItemId() == R.id.menu_item_5_sec) {
-            setupTestButton();
+        } else if (item.getItemId() == R.id.menu_item_one_tick_test) {
+            showOneTickTestButton();
+        }
+        else if (item.getItemId() == R.id.menu_item_5_sec) {
+            show5SecTestButton();
         } else {
-            resetTests();
+            hideTestButton();
         }
 
         return super.onOptionsItemSelected(item);
@@ -210,9 +213,9 @@ public class MainActivity extends AppCompatActivity {
                             .saveUISharedPreferences(false,
                                     mainActivityViewModel.getHowManyMinutes());
                     break;
-                case ACTION_5_SECONDS_TEST:
+                case ACTION_ONE_TICK_TEST:
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "ACTION 5 SECONDS TEST received");
+                        Log.d(TAG, "Action one tick test received");
                         showFinishPomodoroDialog();
                     }
                     break;
@@ -244,11 +247,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @VisibleForTesting
-    public void setupTestButton() {
+    private void showOneTickTestButton() {
         Button testBtn = findViewById(R.id.btn_test);
+        testBtn.setText(R.string.txt_menu_item_one_tick_test);
         testBtn.setVisibility(View.VISIBLE);
         testBtn.setOnClickListener(v -> {
-            Log.d(TAG, "Click on button test 5 sec");
+            Log.d(TAG, "Click on button test one tick");
             mainActivityViewModel.setStateActive();
             chronometerView.setActive(true);
             chronometerServiceAccessor.sendOneTick();
@@ -256,7 +260,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @VisibleForTesting
-    private void resetTests() {
+    public void show5SecTestButton() {
+        Button testBtn = findViewById(R.id.btn_test);
+        testBtn.setText(R.string.txt_menu_item_5_sec_test);
+        testBtn.setVisibility(View.VISIBLE);
+        testBtn.setOnClickListener(v -> {
+            Log.d(TAG, "Click on button test 5 sec");
+            mainActivityViewModel.setStateActive();
+            chronometerView.setActive(true);
+            chronometerServiceAccessor.start5secCount();
+        });
+    }
+
+    @VisibleForTesting
+    private void hideTestButton() {
         Button testBtn = findViewById(R.id.btn_test);
         testBtn.setVisibility(View.GONE);
     }
