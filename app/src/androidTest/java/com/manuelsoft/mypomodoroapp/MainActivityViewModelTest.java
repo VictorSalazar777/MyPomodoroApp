@@ -25,14 +25,14 @@ public class MainActivityViewModelTest {
 
     @Test
     public void setStateActive_newStateActive() {
-        mainActivityViewModel.setStateActive();
-        assertThat(mainActivityViewModel.isActive(), is(true));
+        mainActivityViewModel.runChronometer(true);
+        assertThat(mainActivityViewModel.isChronometerRunning(), is(true));
     }
 
     @Test
     public void setStateInactive_newStateInactive() {
-        mainActivityViewModel.setStateInactive();
-        assertThat(!mainActivityViewModel.isActive(), is(true));
+        mainActivityViewModel.runChronometer(false);
+        assertThat(!mainActivityViewModel.isChronometerRunning(), is(true));
     }
 
     @Test

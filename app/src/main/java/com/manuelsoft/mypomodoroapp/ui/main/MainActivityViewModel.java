@@ -8,20 +8,16 @@ public class MainActivityViewModel extends ViewModel {
 
     public static final int FIFTEEN = 15;
     public static final int TWENTY = 20;
-    private Boolean activeState = false;
+    private Boolean chronometerIsRunning = false;
     private int minutes = TWENTY;
     public static final String TAG = MainActivityViewModel.class.getName();
 
-    public void setStateActive() {
-        activeState = true;
+    public void runChronometer(boolean chronometerIsRunning) {
+        this.chronometerIsRunning = chronometerIsRunning;
     }
 
-    public void setStateInactive() {
-        activeState = false;
-    }
-
-    public boolean isActive() {
-        return activeState;
+    public boolean isChronometerRunning() {
+        return chronometerIsRunning;
     }
 
     public void setFifteenMinutes() {

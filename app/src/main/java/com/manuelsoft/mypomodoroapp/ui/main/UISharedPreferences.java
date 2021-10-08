@@ -12,7 +12,7 @@ import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.TWENTY;
 class UISharedPreferences {
 
     public static final String TAG = UISharedPreferences.class.getName();
-    private Context context;
+    private final Context context;
 
     public UISharedPreferences(Context context) {
         this.context = context;
@@ -22,7 +22,7 @@ class UISharedPreferences {
         return context.getSharedPreferences(UI_SHARED_PREFERENCES, Context.MODE_PRIVATE);
     }
 
-    public void saveUISharedPreferences(boolean chronometerIsRunning, int time) {
+    public void saveChronometerState(boolean chronometerIsRunning, int time) {
         getUISharedPreferences().edit()
                 .putBoolean(CHRONOMETER_IS_RUNNING, chronometerIsRunning)
                 .putInt(TIME_SELECTED, time)

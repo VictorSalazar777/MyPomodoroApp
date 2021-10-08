@@ -68,9 +68,7 @@ class ReceiverAccessor {
 
     public void connect() {
         Log.d(MainActivity.TAG, "connect");
-        if (receiver == null) {
-            Log.d(MainActivity.TAG, "Receiver is null");
-        }
+
         registerReceiver();
     }
 
