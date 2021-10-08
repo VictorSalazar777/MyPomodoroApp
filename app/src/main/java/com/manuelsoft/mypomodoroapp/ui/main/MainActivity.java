@@ -11,6 +11,7 @@ import android.widget.Button;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -40,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton fifteenMinutesBtn;
     private MaterialButton twentyMinutesBtn;
     private Toolbar toolbar;
-    private ChronometerView chronometerView;
+    private AppCompatTextView chronometerView;
     private ReceiverAccessor receiverAccessor;
     private UISharedPreferences uiSharedPreferences;
     private ChronometerServiceAccessor chronometerServiceAccessor;
@@ -167,7 +168,6 @@ public class MainActivity extends AppCompatActivity {
         startStopBtn.setOnClickListener(v -> {
             if (mainActivityViewModel.isActive()) {
                 mainActivityViewModel.setStateInactive();
-                chronometerView.setActive(false);
                 startStopBtn.setText(R.string.txt_btn_start);
                 if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
                     chronometerView.setText(R.string.txt_twenty_minutes);
@@ -181,7 +181,6 @@ public class MainActivity extends AppCompatActivity {
                 chronometerServiceAccessor.stopChronometer();
             } else {
                 mainActivityViewModel.setStateActive();
-                chronometerView.setActive(true);
                 uiSharedPreferences
                         .saveUISharedPreferences(true,
                                 mainActivityViewModel.getHowManyMinutes());
@@ -197,7 +196,6 @@ public class MainActivity extends AppCompatActivity {
         chronometerView = findViewById(R.id.chronometer);
         String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
         chronometerView.setText(minutes);
-        chronometerView.setActive(mainActivityViewModel.isActive());
     }
 
     private void setupReceiver() {
@@ -228,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onFinishPomodoro() {
-        chronometerView.setActive(false);
         startStopBtn.setText(R.string.txt_btn_start);
         mainActivityViewModel.setStateInactive();
         fifteenMinutesBtn.setEnabled(true);
@@ -254,7 +251,6 @@ public class MainActivity extends AppCompatActivity {
         testBtn.setOnClickListener(v -> {
             Log.d(TAG, "Click on button test one tick");
             mainActivityViewModel.setStateActive();
-            chronometerView.setActive(true);
             chronometerServiceAccessor.sendOneTick();
         });
     }
@@ -267,7 +263,6 @@ public class MainActivity extends AppCompatActivity {
         testBtn.setOnClickListener(v -> {
             Log.d(TAG, "Click on button test 5 sec");
             mainActivityViewModel.setStateActive();
-            chronometerView.setActive(true);
             chronometerServiceAccessor.start5secCount();
         });
     }

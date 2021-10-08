@@ -21,9 +21,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.assertThat;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.isNotEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -84,164 +86,164 @@ public class UITest {
                 .check(matches(withText(R.string.txt_btn_start)));
     }
 
-    @Test
-    public void clickStartStopBtn_onBtnShowingStartText_startChronometer() {
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(R.string.txt_btn_start)));
-
-        Log.d(TAG, "Clicking btn_start_stop");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
-    }
-
-    @Test
-    public void clickStartStopBtn_onBtnShowingStopText_stopChronometer() {
-
-        Log.d(TAG, "Clicking btn_start_stop");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId((R.id.btn_start_stop)))
-                .check(matches(withText(R.string.txt_btn_stop)));
-
-        Log.d(TAG, "Clicking btn_start_stop");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-    }
-
-    @Test
-    public void FifteenMinutesBtnSays_15min () {
-        onView(withId(R.id.btn_fifteen_min)).check(matches(withText(R.string.txt_btn_fifteen_minutes)));
-    }
-
-    @Test
-    public void TwentyMinutesBtnSays_20min () {
-        onView(withId(R.id.btn_twenty_min)).check(matches(withText(R.string.txt_btn_twenty_minutes)));
-    }
-
-    @Test
-    public void GivenStatusInactive_WhenClickStartStopBtn_ThenFifteenMinutesBtnAndTwentyMinutesBtnAreDisabled() {
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG,  "Clicking start_stop button");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking buttons states");
-        onView(withId(R.id.btn_fifteen_min)).check(matches(isNotEnabled()));
-        onView(withId(R.id.btn_twenty_min)).check(matches(isNotEnabled()));
-    }
-
-    @Test
-    public void GivenStatusActiveWithFifteenMinutes_WhenClickStartStopBtn_ThenTwentyMinutesBtnIsEnabled() {
-        onView(withId(R.id.btn_fifteen_min)).perform(click());
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
-
-        Log.d(TAG,  "Clicking start_stop button");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking button state");
-        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
-    }
-
-    @Test
-    public void GivenStatusActiveWithTwentyMinutes_WhenClickStartStopBtn_ThenFifteenMinutesBtnIsEnabled() {
-        onView(withId(R.id.btn_twenty_min)).perform(click());
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
-
-        Log.d(TAG,  "Clicking start_stop button");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking button state");
-        onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
-    }
-
-    @Test
-    public void GivenStatusActiveWithFifteenMinutes_WhenClickStartStopBtn_ThenFifteenMinutesIsShowed() {
-        onView(withId(R.id.btn_fifteen_min)).perform(click());
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
-
-        SystemClock.sleep(1000);
-
-        Log.d(TAG,  "Clicking start_stop button");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking button state");
-        onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
-    }
-
-    @Test
-    public void GivenStatusActiveWithTwentyMinutes_WhenClickStartStopBtn_ThenTwentyMinutesIsShowed() {
-        onView(withId(R.id.btn_twenty_min)).perform(click());
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
-
-        SystemClock.sleep(1000);
-
-        Log.d(TAG,  "Clicking start_stop button");
-        onView(withId(R.id.btn_start_stop)).perform(click());
-
-        Log.d(TAG, "Checking button state");
-        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
-    }
-
-    @Test
-    public void WhenTheAppJustStarted_ThenStatusInactiveAndChronometerShowsTwentyMinutesAndTwentyMinutesBtnEnabledAndFifteenMinutesBtnEnabled() {
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG, "Checking first running requirements");
-        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
-        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
-        onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
-    }
-
-    @Test
-    public void GivenStatusInactive_WhenClickTwentyMinutesBtn_ThenChronometerShowsTwentyMinutes() {
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG,  "Clicking twenty button");
-        onView(withId(R.id.btn_twenty_min)).perform(click());
-
-        Log.d(TAG,  "Checking chronometer text");
-        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
-    }
-
-    @Test
-    public void GivenStatusInactive_WhenClickFifteenMinutesBtn_ThenChronometerShowsFifteenMinutes() {
-        Log.d(TAG, "Checking initial state");
-        onView(withId(R.id.chronometer))
-                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
-
-        Log.d(TAG,  "Clicking twenty button");
-        onView(withId(R.id.btn_fifteen_min)).perform(click());
-
-        Log.d(TAG,  "Checking chronometer text");
-        onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
-    }
+//    @Test
+//    public void clickStartStopBtn_onBtnShowingStartText_startChronometer() {
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId((R.id.btn_start_stop)))
+//                .check(matches(withText(R.string.txt_btn_start)));
+//
+//        Log.d(TAG, "Clicking btn_start_stop");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+//    }
+//
+//    @Test
+//    public void clickStartStopBtn_onBtnShowingStopText_stopChronometer() {
+//
+//        Log.d(TAG, "Clicking btn_start_stop");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId((R.id.btn_start_stop)))
+//                .check(matches(withText(R.string.txt_btn_stop)));
+//
+//        Log.d(TAG, "Clicking btn_start_stop");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
+//    }
+//
+//    @Test
+//    public void FifteenMinutesBtnSays_15min () {
+//        onView(withId(R.id.btn_fifteen_min)).check(matches(withText(R.string.txt_btn_fifteen_minutes)));
+//    }
+//
+//    @Test
+//    public void TwentyMinutesBtnSays_20min () {
+//        onView(withId(R.id.btn_twenty_min)).check(matches(withText(R.string.txt_btn_twenty_minutes)));
+//    }
+//
+//    @Test
+//    public void GivenStatusInactive_WhenClickStartStopBtn_ThenFifteenMinutesBtnAndTwentyMinutesBtnAreDisabled() {
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
+//
+//        Log.d(TAG,  "Clicking start_stop button");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking buttons states");
+//        onView(withId(R.id.btn_fifteen_min)).check(matches(isNotEnabled()));
+//        onView(withId(R.id.btn_twenty_min)).check(matches(isNotEnabled()));
+//    }
+//
+//    @Test
+//    public void GivenStatusActiveWithFifteenMinutes_WhenClickStartStopBtn_ThenTwentyMinutesBtnIsEnabled() {
+//        onView(withId(R.id.btn_fifteen_min)).perform(click());
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+//
+//        Log.d(TAG,  "Clicking start_stop button");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking button state");
+//        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
+//    }
+//
+//    @Test
+//    public void GivenStatusActiveWithTwentyMinutes_WhenClickStartStopBtn_ThenFifteenMinutesBtnIsEnabled() {
+//        onView(withId(R.id.btn_twenty_min)).perform(click());
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+//
+//        Log.d(TAG,  "Clicking start_stop button");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking button state");
+//        onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
+//    }
+//
+//    @Test
+//    public void GivenStatusActiveWithFifteenMinutes_WhenClickStartStopBtn_ThenFifteenMinutesIsShowed() {
+//        onView(withId(R.id.btn_fifteen_min)).perform(click());
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+//
+//        SystemClock.sleep(1000);
+//
+//        Log.d(TAG,  "Clicking start_stop button");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking button state");
+//        onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
+//    }
+//
+//    @Test
+//    public void GivenStatusActiveWithTwentyMinutes_WhenClickStartStopBtn_ThenTwentyMinutesIsShowed() {
+//        onView(withId(R.id.btn_twenty_min)).perform(click());
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(true)));
+//
+//        SystemClock.sleep(1000);
+//
+//        Log.d(TAG,  "Clicking start_stop button");
+//        onView(withId(R.id.btn_start_stop)).perform(click());
+//
+//        Log.d(TAG, "Checking button state");
+//        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
+//    }
+//
+//    @Test
+//    public void WhenTheAppJustStarted_ThenStatusInactiveAndChronometerShowsTwentyMinutesAndTwentyMinutesBtnEnabledAndFifteenMinutesBtnEnabled() {
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
+//
+//        Log.d(TAG, "Checking first running requirements");
+//        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
+//        onView(withId(R.id.btn_twenty_min)).check(matches(isEnabled()));
+//        onView(withId(R.id.btn_fifteen_min)).check(matches(isEnabled()));
+//    }
+//
+//    @Test
+//    public void GivenStatusInactive_WhenClickTwentyMinutesBtn_ThenChronometerShowsTwentyMinutes() {
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
+//
+//        Log.d(TAG,  "Clicking twenty button");
+//        onView(withId(R.id.btn_twenty_min)).perform(click());
+//
+//        Log.d(TAG,  "Checking chronometer text");
+//        onView(withId(R.id.chronometer)).check(matches(withText(TWENTY_MINUTES)));
+//    }
+//
+//    @Test
+//    public void GivenStatusInactive_WhenClickFifteenMinutesBtn_ThenChronometerShowsFifteenMinutes() {
+//        Log.d(TAG, "Checking initial state");
+//        onView(withId(R.id.chronometer))
+//                .check(matches(MyChronometerActiveMatcher.withIsActive(false)));
+//
+//        Log.d(TAG,  "Clicking twenty button");
+//        onView(withId(R.id.btn_fifteen_min)).perform(click());
+//
+//        Log.d(TAG,  "Checking chronometer text");
+//        onView(withId(R.id.chronometer)).check(matches(withText(FIFTEEN_MINUTES)));
+//    }
 
 //    @Test
 //    public void WhenPomodoroTimeIsUp_ThenShowPomodoroFinishDialog() {

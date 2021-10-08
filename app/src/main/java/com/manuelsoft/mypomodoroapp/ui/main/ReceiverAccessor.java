@@ -50,7 +50,6 @@ class ReceiverAccessor {
         };
     }
 
-
     private void registerReceiver() {
         if (!receiverRegistered) {
             receiverRegistered = true;
