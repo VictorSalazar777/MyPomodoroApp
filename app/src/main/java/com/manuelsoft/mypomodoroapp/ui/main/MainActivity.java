@@ -74,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             mainActivityViewModel.setTwentyMinutes();
         }
-
     }
 
     private boolean isChronometerServiceInTheForeground() {
@@ -165,28 +164,37 @@ public class MainActivity extends AppCompatActivity {
         }
         startStopBtn.setOnClickListener(v -> {
             if (mainActivityViewModel.isChronometerRunning()) {
-                mainActivityViewModel.runChronometer(false);
-                startStopBtn.setText(R.string.txt_btn_start);
-                if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
-                    chronometerView.setText(R.string.txt_twenty_minutes);
-                    uiSharedPreferences.saveChronometerState(false, TWENTY);
-                } else {
-                    chronometerView.setText(R.string.txt_fifteen_minutes);
-                    uiSharedPreferences.saveChronometerState(false, FIFTEEN);
-                }
-                enableTimeButtons();
-                chronometerServiceAccessor.stopChronometer();
+                stopChronometer();
             } else {
-                mainActivityViewModel.runChronometer(true);
-                uiSharedPreferences
-                        .saveChronometerState(true,
-                                mainActivityViewModel.getHowManyMinutes());
-                startStopBtn.setText(R.string.txt_btn_stop);
-                disableTimeButtons();
-                chronometerServiceAccessor.startChronometer(mainActivityViewModel.getHowManyMinutes());
+                startChronometer();
             }
         });
     }
+
+    private void startChronometer() {
+        mainActivityViewModel.runChronometer(true);
+        uiSharedPreferences
+                .saveChronometerState(true,
+                        mainActivityViewModel.getHowManyMinutes());
+        startStopBtn.setText(R.string.txt_btn_stop);
+        disableTimeButtons();
+        chronometerServiceAccessor.startChronometer(mainActivityViewModel.getHowManyMinutes());
+    }
+
+    private void stopChronometer() {
+        mainActivityViewModel.runChronometer(false);
+        startStopBtn.setText(R.string.txt_btn_start);
+        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
+            chronometerView.setText(R.string.txt_twenty_minutes);
+            uiSharedPreferences.saveChronometerState(false, TWENTY);
+        } else {
+            chronometerView.setText(R.string.txt_fifteen_minutes);
+            uiSharedPreferences.saveChronometerState(false, FIFTEEN);
+        }
+        enableTimeButtons();
+        chronometerServiceAccessor.stopChronometer();
+    }
+
 
     private void enableTimeButtons() {
         fifteenMinutesBtn.setEnabled(true);

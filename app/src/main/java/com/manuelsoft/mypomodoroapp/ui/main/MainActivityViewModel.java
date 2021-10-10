@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel;
 
 public class MainActivityViewModel extends ViewModel {
 
+    public static final String TAG = MainActivityViewModel.class.getName();
     public static final int FIFTEEN = 15;
     public static final int TWENTY = 20;
-    private Boolean chronometerIsRunning = false;
     private int minutes = TWENTY;
-    public static final String TAG = MainActivityViewModel.class.getName();
+    private boolean chronometerIsRunning = false;
 
     public void runChronometer(boolean chronometerIsRunning) {
         this.chronometerIsRunning = chronometerIsRunning;
