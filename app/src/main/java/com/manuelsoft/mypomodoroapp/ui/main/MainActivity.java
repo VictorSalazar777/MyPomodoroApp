@@ -23,6 +23,7 @@ import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SEC_TEST_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
@@ -232,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "Action one tick test received");
                         showFinishPomodoroDialog();
                     }
+                case ACTION_5_SEC_TEST_FINISH:
                     break;
                 default:
                     throw new RuntimeException("Receiver: unknown option");

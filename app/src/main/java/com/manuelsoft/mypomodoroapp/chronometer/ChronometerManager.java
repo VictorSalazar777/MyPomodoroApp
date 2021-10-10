@@ -43,7 +43,6 @@ class ChronometerManager {
     }
 
     public void setChronometer(int pomodoroMinutes) {
-
         ChronometerTask task = (minutes, seconds, counter) -> {
             String time = chronometerTimer.print(minutes, seconds);
             sendMessage(ACTION_TICK, TIME, time);
@@ -104,5 +103,10 @@ class ChronometerManager {
                 sendMessage(ACTION_ONE_TICK_TEST, null, null);
             }
         }.start();
+    }
+
+    @VisibleForTesting
+    public void start5secCount() {
+
     }
 }

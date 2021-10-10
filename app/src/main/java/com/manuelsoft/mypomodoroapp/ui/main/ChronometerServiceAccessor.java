@@ -88,7 +88,10 @@ class ChronometerServiceAccessor {
         }
     }
 
+    @VisibleForTesting
     public void start5secCount() {
-
+        if (bound) {
+            service.start5secCount();
+        }
     }
 }

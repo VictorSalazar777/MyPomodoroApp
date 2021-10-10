@@ -16,8 +16,9 @@ public class ChronometerService extends Service {
     public static final String TIME = "time";
     public static final String VENDOR = "com.manuelsoft.mypomodoroapp.";
     public static final String ACTION_TICK = VENDOR + "tick";
-    public static final String ACTION_FINISH = VENDOR + ".finish";
-    public static final String ACTION_ONE_TICK_TEST = VENDOR + "test";
+    public static final String ACTION_FINISH = VENDOR + "finish";
+    public static final String ACTION_ONE_TICK_TEST = VENDOR + "one_tick_test";
+    public static final String ACTION_5_SEC_TEST_FINISH = VENDOR + "5_sec_test";
     public static final int NOTIFICATION_SERVICE_ID = 1;
     public static final String POMODORO_CHANNEL_ID = "channel_1";
     private Notification notification;
@@ -74,6 +75,11 @@ public class ChronometerService extends Service {
     @VisibleForTesting
     public void sendOneTick() {
         chronometerManager.sendOneTick();
+    }
+
+    @VisibleForTesting
+    public void start5secCount() {
+        chronometerManager.start5secCount();
     }
 
     @Override
