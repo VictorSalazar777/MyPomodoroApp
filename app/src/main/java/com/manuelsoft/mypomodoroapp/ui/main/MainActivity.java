@@ -58,9 +58,10 @@ public class MainActivity extends AppCompatActivity {
         setupViewModel();
         setupToolbar();
         setupChronometer();
-        setupStartStopBtn();
-        setupFifteenMinutesBtn();
-        setupTwentyMinutesBtn();
+        setupButtons();
+        setupStartStopBtnAction();
+        setupFifteenMinutesBtnAction();
+        setupTwentyMinutesBtnAction();
     }
 
     private void setupViewModel() {
@@ -121,15 +122,29 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupTwentyMinutesBtn() {
+    private void setupButtons() {
         twentyMinutesBtn = findViewById(R.id.btn_twenty_min);
+        fifteenMinutesBtn = findViewById(R.id.btn_fifteen_min);
+        startStopBtn = findViewById(R.id.btn_start_stop);
+
         if (mainActivityViewModel.isChronometerRunning()) {
             twentyMinutesBtn.setEnabled(false);
+            fifteenMinutesBtn.setEnabled(false);
+
             if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
                 twentyMinutesBtn.setChecked(true);
             }
-        }
+            else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
+                fifteenMinutesBtn.setChecked(true);
+            }
 
+            startStopBtn.setText(R.string.txt_btn_stop);
+        } else {
+            startStopBtn.setText(R.string.txt_btn_start);
+        }
+    }
+
+    private void setupTwentyMinutesBtnAction() {
         twentyMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
                 mainActivityViewModel.setTwentyMinutes();
@@ -138,15 +153,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupFifteenMinutesBtn() {
-        fifteenMinutesBtn = findViewById(R.id.btn_fifteen_min);
-        if (mainActivityViewModel.isChronometerRunning()) {
-            fifteenMinutesBtn.setEnabled(false);
-            if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
-                fifteenMinutesBtn.setChecked(true);
-            }
-        }
-
+    private void setupFifteenMinutesBtnAction() {
         fifteenMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
                 mainActivityViewModel.setFifteenMinutes();
@@ -155,13 +162,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupStartStopBtn() {
-        startStopBtn = findViewById(R.id.btn_start_stop);
-        if (mainActivityViewModel.isChronometerRunning()) {
-            startStopBtn.setText(R.string.txt_btn_stop);
-        } else {
-            startStopBtn.setText(R.string.txt_btn_start);
-        }
+    private void setupStartStopBtnAction() {
         startStopBtn.setOnClickListener(v -> {
             if (mainActivityViewModel.isChronometerRunning()) {
                 stopChronometer();
