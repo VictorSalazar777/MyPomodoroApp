@@ -147,8 +147,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupTwentyMinutesBtnAction() {
         twentyMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
-                mainActivityViewModel.setTwentyMinutes();
-                chronometerView.setText(R.string.txt_twenty_minutes);
+                setChronometerToTwentyMinutes();
             }
         });
     }
@@ -156,10 +155,19 @@ public class MainActivity extends AppCompatActivity {
     private void setupFifteenMinutesBtnAction() {
         fifteenMinutesBtn.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
-                mainActivityViewModel.setFifteenMinutes();
-                chronometerView.setText(R.string.txt_fifteen_minutes);
+                setChronometerToFifteenMinutes();
             }
         });
+    }
+
+    private void setChronometerToTwentyMinutes() {
+        mainActivityViewModel.setTwentyMinutes();
+        chronometerView.setText(R.string.txt_twenty_minutes);
+    }
+
+    private void setChronometerToFifteenMinutes() {
+        mainActivityViewModel.setFifteenMinutes();
+        chronometerView.setText(R.string.txt_fifteen_minutes);
     }
 
     private void setupStartStopBtnAction() {
