@@ -182,9 +182,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startChronometer() {
         mainActivityViewModel.runChronometer(true);
-        uiSharedPreferences
-                .saveChronometerState(true,
-                        mainActivityViewModel.getHowManyMinutes());
+        saveCurrentChronometerTimeSet(true, mainActivityViewModel.getHowManyMinutes());
         startStopBtn.setText(R.string.txt_btn_stop);
         disableTimeButtons();
         chronometerServiceAccessor.startChronometer(mainActivityViewModel.getHowManyMinutes());
@@ -195,15 +193,14 @@ public class MainActivity extends AppCompatActivity {
         startStopBtn.setText(R.string.txt_btn_start);
         if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
             chronometerView.setText(R.string.txt_twenty_minutes);
-            uiSharedPreferences.saveChronometerState(false, TWENTY);
+            saveCurrentChronometerTimeSet(false, TWENTY);
         } else {
             chronometerView.setText(R.string.txt_fifteen_minutes);
-            uiSharedPreferences.saveChronometerState(false, FIFTEEN);
+            saveCurrentChronometerTimeSet(false, FIFTEEN);
         }
         enableTimeButtons();
         chronometerServiceAccessor.stopChronometer();
     }
-
 
     private void enableTimeButtons() {
         fifteenMinutesBtn.setEnabled(true);
@@ -217,22 +214,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupChronometer() {
         chronometerView = findViewById(R.id.chronometer);
-        String minutes = mainActivityViewModel.getHowManyMinutes() + ":00";
-        chronometerView.setText(minutes);
+        setChronometerTimeDisplayed(mainActivityViewModel.getHowManyMinutes() + ":00");
     }
 
     private void setupReceiver() {
         ReceiverAccessor.OnReceive onReceive = (context, intent) -> {
             switch (intent.getAction()) {
                 case ACTION_TICK:
-                    String time = intent.getStringExtra(TIME);
-                    chronometerView.setText(time);
+                    setChronometerTimeDisplayed(intent.getStringExtra(TIME));
                     break;
                 case ACTION_FINISH:
                     showFinishPomodoroDialog();
-                    uiSharedPreferences
-                            .saveChronometerState(false,
-                                    mainActivityViewModel.getHowManyMinutes());
+                    saveCurrentChronometerTimeSet(false, mainActivityViewModel.getHowManyMinutes());
                     break;
                 case ACTION_ONE_TICK_TEST:
                     if (BuildConfig.DEBUG) {
@@ -246,6 +239,15 @@ public class MainActivity extends AppCompatActivity {
         };
 
         receiverAccessor = new ReceiverAccessor(this, onReceive);
+    }
+
+    private void setChronometerTimeDisplayed(String time) {
+        chronometerView.setText(time);
+    }
+
+    private void saveCurrentChronometerTimeSet(boolean chronometerIsRunning, int howManyMinutes) {
+        uiSharedPreferences
+                .saveChronometerState(chronometerIsRunning, howManyMinutes);
     }
 
     private void onFinishPomodoro() {
