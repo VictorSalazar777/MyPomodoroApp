@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
         uiSharedPreferences = new UISharedPreferences(this);
         chronometerServiceAccessor = new ChronometerServiceAccessor(this);
 
-        setupViewModel();
         setupToolbar();
+        setupViewModel();
         setupChronometer();
         setupButtons();
         setupStartStopBtnAction();
@@ -67,15 +67,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        mainActivityViewModel.runChronometer(
-                uiSharedPreferences.loadChronometerIsRunning()
-                        && isChronometerServiceInTheForeground());
-
-        if (uiSharedPreferences.loadTimeSelected() == FIFTEEN) {
-            mainActivityViewModel.setFifteenMinutes();
-        } else {
-            mainActivityViewModel.setTwentyMinutes();
-        }
+//        mainActivityViewModel.runChronometer(
+//                uiSharedPreferences.loadChronometerIsRunning()
+//                        && isChronometerServiceInTheForeground());
+//
+//        if (uiSharedPreferences.loadTimeSelected() == FIFTEEN) {
+//            setChronometerToFifteenMinutes();
+//        } else {
+//            setChronometerToTwentyMinutes();
+//        }
     }
 
     private boolean isChronometerServiceInTheForeground() {
@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             show5SecTestButton();
         } else {
             hideTestButton();
+            setupChronometer();
         }
 
         return super.onOptionsItemSelected(item);
@@ -234,6 +235,11 @@ public class MainActivity extends AppCompatActivity {
                         showFinishPomodoroDialog();
                     }
                 case ACTION_5_SEC_TEST_FINISH:
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Action 5 sec test received");
+                        showFinishPomodoroDialog();
+                        findViewById(R.id.btn_test).setEnabled(true);
+                    }
                     break;
                 default:
                     throw new RuntimeException("Receiver: unknown option");
@@ -256,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
         mainActivityViewModel.runChronometer(false);
         startStopBtn.setText(R.string.txt_btn_start);
         enableTimeButtons();
+        setupChronometer();
     }
 
     private void showFinishPomodoroDialog() {
@@ -287,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
         testBtn.setText(R.string.txt_menu_item_5_sec_test);
         testBtn.setVisibility(View.VISIBLE);
         testBtn.setOnClickListener(v -> {
+            v.setEnabled(false);
             Log.d(TAG, "Click on button test 5 sec");
             mainActivityViewModel.runChronometer(true);
             chronometerServiceAccessor.start5secCount();

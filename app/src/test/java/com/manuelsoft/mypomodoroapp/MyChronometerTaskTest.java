@@ -18,8 +18,7 @@ public class MyChronometerTaskTest {
         void execute(int minutes, int seconds, long counter);
     }
 
-
-    class MyChronometerTaskForTesting {
+    static class MyChronometerTaskForTesting {
 
         private int minutes = 0;
         private int seconds = -1;
@@ -27,25 +26,27 @@ public class MyChronometerTaskTest {
         private MyTask myTask;
         private MyTask end;
         private MyCountDownTimer myCountDownTimer;
-        private boolean isRunning = false;
-
+        boolean init = false;
 
         public void set(int minutes, MyTask myTask, MyTask end) {
+            set(minutes, 0, myTask, end);
+        }
+
+        public void set(int minutes, int seconds, MyTask myTask, MyTask end) {
             this.minutes = minutes;
             this.myTask = myTask;
             this.end = end;
-            this.seconds = -1;
+            this.seconds = seconds;
             counter = 0L;
         }
 
         public void cancel() {
             myCountDownTimer.cancel();
-            isRunning = false;
         }
 
         public void execute() {
-            isRunning = true;
-            myCountDownTimer = new MyCountDownTimer(minutes * 60000L + 1000L, 1000L) {
+            init = true;
+            myCountDownTimer = new MyCountDownTimer(minutes * 60000L + seconds * 1000L + 1000L, 1000L) {
                 @Override
                 void onFinish() {
                     end.execute(minutes, seconds, counter);
@@ -57,8 +58,8 @@ public class MyChronometerTaskTest {
                         this.cancel();
                     }
                     counter++;
-                    if (seconds == -1) {
-                        seconds = 0;
+                    if (init) {
+                        init = false;
                     } else if (seconds == 0) {
                         --minutes;
                         seconds = 59;
@@ -89,10 +90,6 @@ public class MyChronometerTaskTest {
 
             chronometerString = minutesString + ":" + secondsString;
             return chronometerString;
-        }
-
-        public boolean isRunning() {
-            return isRunning;
         }
     }
 
@@ -301,5 +298,6 @@ public class MyChronometerTaskTest {
 
         assertThat(run, is(true));
     }
+
 
 }

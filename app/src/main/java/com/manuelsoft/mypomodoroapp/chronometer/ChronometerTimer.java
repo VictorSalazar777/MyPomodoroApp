@@ -1,89 +1,60 @@
 package com.manuelsoft.mypomodoroapp.chronometer;
 
-import android.os.CountDownTimer;
 
-interface ChronometerTask {
-    void execute(int minutes, int seconds, long counter);
-}
+import android.util.Log;
 
 public class ChronometerTimer {
 
-    private int minutes = 0;
-    private int seconds = -1;
-    private long counter = 0L;
-    private ChronometerTask myTask;
+    public static final String TAG = ChronometerTimer.class.getName();
+    private ChronometerTask task;
     private ChronometerTask end;
-    private CountDownTimer myCountDownTimer;
-    private boolean isRunning = false;
+    private int minutes;
+    private int seconds;
+    private long counter = 0;
+    private RepetitiveTask repetitiveTask;
 
-    public void set(int minutes, ChronometerTask myTask, ChronometerTask end) {
-        this.minutes = minutes;
-        this.myTask = myTask;
+    public void set(int minutes, ChronometerTask task, ChronometerTask end) {
+        set(minutes, 0, task, end);
+    }
+
+    public void set(int minutes, int seconds, ChronometerTask task, ChronometerTask end) {
+        assert task != null : "Task is null";
+        assert end != null : "End is null";
+        this.task = task;
         this.end = end;
-        this.seconds = -1;
-        counter = 0L;
+        this.minutes = minutes;
+        this.seconds = seconds;
+        counter = minutes * 60L + seconds;
+        repetitiveTask = new RepetitiveTask(createChronometerRunnable(), 1000L);
+    }
+
+    public void execute() {
+        repetitiveTask.start(true);
+    }
+
+    private Runnable createChronometerRunnable() {
+        return () -> {
+            Log.d(TAG, "createChronometerRunnable: " + counter + " s: " + seconds);
+
+            if (counter == 0) {
+                task.execute(minutes, seconds, counter);
+                end.execute(minutes, seconds, counter);
+                Log.d(TAG, "createChronometerRunnable: stop");
+                repetitiveTask.stop();
+            }
+            task.execute(minutes, seconds, counter);
+            if (seconds == 0) {
+                --minutes;
+                seconds = 59;
+            } else {
+                --seconds;
+            }
+            --counter;
+        };
     }
 
     public void cancel() {
-        isRunning = false;
-        myCountDownTimer.cancel();
+        repetitiveTask.stop();
     }
 
-    public CountDownTimer execute() {
-        isRunning = true;
-        myCountDownTimer = new CountDownTimer(minutes * 60000L + 1000L, 1000L) {
-            @Override
-            public void onFinish() {
-                counter++;
-                seconds--;
-                myTask.execute(minutes, seconds, counter);
-                end.execute(minutes, seconds, counter);
-            }
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                if (millisUntilFinished <= 0L) {
-                    cancel();
-                } else {
-                    counter++;
-                    if (seconds == -1) {
-                        seconds = 0;
-                    } else if (seconds == 0) {
-                        --minutes;
-                        seconds = 59;
-                    } else {
-                        --seconds;
-                    }
-                    myTask.execute(minutes, seconds, counter);
-                }
-            }
-        };
-        myCountDownTimer.start();
-        return myCountDownTimer;
-    }
-
-    public String print(int minutes, int seconds) {
-        String chronometerString;
-        String secondsString, minutesString;
-
-        if (seconds < 10) {
-            secondsString = "0" + seconds;
-        } else {
-            secondsString = String.valueOf(seconds);
-        }
-
-        if (minutes < 10) {
-            minutesString = "0" + minutes;
-        } else {
-            minutesString = String.valueOf(minutes);
-        }
-
-        chronometerString = minutesString + ":" + secondsString;
-        return chronometerString;
-    }
-
-   // @MainThread
-    public boolean isRunning() {
-        return isRunning;
-    }
 }

@@ -3,12 +3,15 @@ package com.manuelsoft.mypomodoroapp.chronometer;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SEC_TEST_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
@@ -20,6 +23,9 @@ class ChronometerManager {
     private final ChronometerTimer chronometerTimer;
     private Handler chronometerHandler;
     private final SoundHelper soundHelper;
+    private ChronometerTask task;
+    private ChronometerTask end;
+
     private boolean isRunning = false;
 
     ChronometerManager(@NonNull Context context) {
@@ -27,6 +33,18 @@ class ChronometerManager {
         this.context = context;
         chronometerTimer = new ChronometerTimer();
         soundHelper = new SoundHelper(context);
+        task = (minutes, seconds, counter) -> {
+            String time = print(minutes, seconds);
+            sendMessage(ACTION_TICK, TIME, time);
+        };
+
+        end = (minutes, seconds, counter) -> {
+            isRunning = false;
+            sendMessage(ACTION_FINISH, null, null);
+//            chronometerHandler.getLooper().quit();
+            // chronometerHandler.removeCallbacksAndMessages(null);
+            soundHelper.stop();
+        };
     }
 
     public void sendMessage(String action, String name, String message) {
@@ -43,20 +61,11 @@ class ChronometerManager {
     }
 
     public void setChronometer(int pomodoroMinutes) {
-        ChronometerTask task = (minutes, seconds, counter) -> {
-            String time = chronometerTimer.print(minutes, seconds);
-            sendMessage(ACTION_TICK, TIME, time);
-        };
+        setChronometer(pomodoroMinutes, 0, task, end);
+    }
 
-        ChronometerTask end = (minutes, seconds, counter) -> {
-            isRunning = false;
-            sendMessage(ACTION_FINISH, null, null);
-            chronometerHandler.getLooper().quit();
-            // chronometerHandler.removeCallbacksAndMessages(null);
-            soundHelper.stop();
-        };
-
-        chronometerTimer.set(pomodoroMinutes, task, end);
+    public void setChronometer(int pomodoroMinutes, int pomodoroSeconds, ChronometerTask task, ChronometerTask end) {
+        chronometerTimer.set(pomodoroMinutes, pomodoroSeconds, task, end);
     }
 
     public void startChronometer() {
@@ -65,20 +74,21 @@ class ChronometerManager {
 //            chronometerTask.execute();
 //        });
         isRunning = true;
-        Thread thread = new Thread(() -> {
-            Looper.prepare();
-            chronometerHandler = new Handler(Looper.myLooper());
+//        Thread thread = new Thread(() -> {
+//            Looper.prepare();
+//            chronometerHandler = new Handler(Looper.myLooper());
             chronometerTimer.execute();
-            Looper.loop();
-        });
-        thread.start();
+//            Looper.loop();
+//        });
+//        thread.start();
         soundHelper.play();
     }
 
     public void stopChronometer() {
         isRunning = false;
-        chronometerHandler.post(chronometerTimer::cancel);
-        chronometerHandler.getLooper().quit();
+//        chronometerHandler.post(chronometerTimer::cancel);
+        chronometerTimer.cancel();
+//        chronometerHandler.getLooper().quit();
         // chronometerHandler.removeCallbacksAndMessages(null);
         soundHelper.stop();
     }
@@ -90,7 +100,8 @@ class ChronometerManager {
     public void onDestroy() {
         if (isRunning) {
             isRunning = false;
-            chronometerHandler.getLooper().quit();
+//            chronometerHandler.getLooper().quit();
+            chronometerTimer.cancel();
         }
         soundHelper.release();
     }
@@ -107,6 +118,18 @@ class ChronometerManager {
 
     @VisibleForTesting
     public void start5secCount() {
+        ChronometerTask end = (minutes, seconds, counter) -> {
+            isRunning = false;
+            sendMessage(ACTION_5_SEC_TEST_FINISH, null, null);
+            soundHelper.stop();
+        };
 
+        setChronometer(0, 5, task, end);
+        startChronometer();
+    }
+
+    private String print(int minutes, int seconds) {
+        NumberFormat f = new DecimalFormat("00");
+        return f.format(minutes) + ":" + f.format(seconds);
     }
 }
