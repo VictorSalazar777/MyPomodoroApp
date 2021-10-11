@@ -1,6 +1,5 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +15,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
@@ -24,8 +24,8 @@ import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SEC_TEST_FINISH;
-import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_FINISH;
+import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_ONE_TICK_TEST;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_TICK;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.TIME;
 import static com.manuelsoft.mypomodoroapp.ui.main.MainActivityViewModel.FIFTEEN;
@@ -140,9 +140,9 @@ public class MainActivity extends AppCompatActivity {
                 fifteenMinutesBtn.setChecked(true);
             }
 
-            startStopBtn.setText(R.string.txt_btn_stop);
+            setStartStopBtnToStop();
         } else {
-            startStopBtn.setText(R.string.txt_btn_start);
+            setStartStopBtnToStart();
         }
     }
 
@@ -162,14 +162,45 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setChronometerToTwentyMinutes() {
-        mainActivityViewModel.setTwentyMinutes();
-        chronometerView.setText(R.string.txt_twenty_minutes);
+    private void showTwentyMinutes() {
+        chronometerView.setText(getString(R.string.txt_twenty_minutes));
+    }
+
+    private void showFifteenMinutes() {
+        chronometerView.setText(getString(R.string.txt_fifteen_minutes));
+    }
+
+    private void showTime(String time) {
+        chronometerView.setText(time);
     }
 
     private void setChronometerToFifteenMinutes() {
+        setFifteenMinutes();
+        showFifteenMinutes();
+    }
+
+    private void setChronometerToTwentyMinutes() {
+        setTwentyMinutes();
+        showTwentyMinutes();
+    }
+
+    private void setFifteenMinutes() {
         mainActivityViewModel.setFifteenMinutes();
-        chronometerView.setText(R.string.txt_fifteen_minutes);
+    }
+
+    private void setTwentyMinutes() {
+        mainActivityViewModel.setTwentyMinutes();
+    }
+
+    private void setupChronometer() {
+        chronometerView = findViewById(R.id.chronometer);
+        setChronometerToTwentyMinutes();
+//        twentyMinutesBtn.setChecked(true);
+    }
+
+    private void saveCurrentChronometerTimeSet(boolean chronometerIsRunning, int howManyMinutes) {
+        uiSharedPreferences
+                .saveChronometerState(chronometerIsRunning, howManyMinutes);
     }
 
     private void setupStartStopBtnAction() {
@@ -182,22 +213,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void startChronometer() {
-        mainActivityViewModel.runChronometer(true);
-        saveCurrentChronometerTimeSet(true, mainActivityViewModel.getHowManyMinutes());
+    private void setStartStopBtnToStop() {
         startStopBtn.setText(R.string.txt_btn_stop);
+    }
+
+    private void setStartStopBtnToStart() {
+        startStopBtn.setText(R.string.txt_btn_start);
+    }
+
+    private void startChronometer() {
+        setRunChronometerTrue();
+        saveCurrentChronometerTimeSet(true, mainActivityViewModel.getHowManyMinutes());
+        setStartStopBtnToStop();
         disableTimeButtons();
         chronometerServiceAccessor.startChronometer(mainActivityViewModel.getHowManyMinutes());
     }
 
-    private void stopChronometer() {
+    private void setRunChronometerTrue() {
+        mainActivityViewModel.runChronometer(true);
+    }
+
+    private void setRunChronometerFalse() {
         mainActivityViewModel.runChronometer(false);
-        startStopBtn.setText(R.string.txt_btn_start);
+    }
+
+    private void stopChronometer() {
+        setRunChronometerFalse();
+        setStartStopBtnToStart();
         if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
-            chronometerView.setText(R.string.txt_twenty_minutes);
+            showTwentyMinutes();
             saveCurrentChronometerTimeSet(false, TWENTY);
         } else {
-            chronometerView.setText(R.string.txt_fifteen_minutes);
+            showFifteenMinutes();
             saveCurrentChronometerTimeSet(false, FIFTEEN);
         }
         enableTimeButtons();
@@ -214,18 +261,14 @@ public class MainActivity extends AppCompatActivity {
         twentyMinutesBtn.setEnabled(false);
     }
 
-    private void setupChronometer() {
-        chronometerView = findViewById(R.id.chronometer);
-        setChronometerTimeDisplayed(mainActivityViewModel.getHowManyMinutes() + ":00");
-    }
-
     private void setupReceiver() {
         ReceiverAccessor.OnReceive onReceive = (context, intent) -> {
             switch (intent.getAction()) {
                 case ACTION_TICK:
-                    setChronometerTimeDisplayed(intent.getStringExtra(TIME));
+                    showTime(intent.getStringExtra(TIME));
                     break;
                 case ACTION_FINISH:
+                    Log.d(TAG, "Action finish received");
                     showFinishPomodoroDialog();
                     saveCurrentChronometerTimeSet(false, mainActivityViewModel.getHowManyMinutes());
                     break;
@@ -234,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "Action one tick test received");
                         showFinishPomodoroDialog();
                     }
+                    break;
                 case ACTION_5_SEC_TEST_FINISH:
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Action 5 sec test received");
@@ -249,26 +293,17 @@ public class MainActivity extends AppCompatActivity {
         receiverAccessor = new ReceiverAccessor(this, onReceive);
     }
 
-    private void setChronometerTimeDisplayed(String time) {
-        chronometerView.setText(time);
-    }
-
-    private void saveCurrentChronometerTimeSet(boolean chronometerIsRunning, int howManyMinutes) {
-        uiSharedPreferences
-                .saveChronometerState(chronometerIsRunning, howManyMinutes);
-    }
-
     private void onFinishPomodoro() {
-        mainActivityViewModel.runChronometer(false);
-        startStopBtn.setText(R.string.txt_btn_start);
+        setRunChronometerFalse();
+        setStartStopBtnToStart();
         enableTimeButtons();
         setupChronometer();
     }
 
     private void showFinishPomodoroDialog() {
-        new AlertDialog.Builder(this)
-                .setMessage(R.string.txt_pomodoro_finished_dialog)
-                .setNeutralButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.txt_pomodoro_finished_dialog)
+                .setPositiveButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
                     dialog.dismiss();
                     onFinishPomodoro();
                 })
@@ -283,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         testBtn.setVisibility(View.VISIBLE);
         testBtn.setOnClickListener(v -> {
             Log.d(TAG, "Click on button test one tick");
-            mainActivityViewModel.runChronometer(true);
+            setRunChronometerTrue();
             chronometerServiceAccessor.sendOneTick();
         });
     }
@@ -296,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
         testBtn.setOnClickListener(v -> {
             v.setEnabled(false);
             Log.d(TAG, "Click on button test 5 sec");
-            mainActivityViewModel.runChronometer(true);
+            setRunChronometerTrue();
             chronometerServiceAccessor.start5secCount();
         });
     }
