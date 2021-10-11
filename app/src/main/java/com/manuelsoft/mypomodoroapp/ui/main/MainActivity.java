@@ -6,20 +6,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.manuelsoft.mypomodoroapp.BuildConfig;
 import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
+import com.manuelsoft.mypomodoroapp.databinding.ActivityMainBinding;
 import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
 
 import static android.view.Menu.NONE;
@@ -38,19 +35,16 @@ public class MainActivity extends AppCompatActivity {
     public static final String CHRONOMETER_IS_RUNNING = "CHRONOMETER_IS_RUNNING";
     public static final String TIME_SELECTED = "TIME_SELECTED";
     private MainActivityViewModel mainActivityViewModel;
-    private Button startStopBtn;
-    private MaterialButton fifteenMinutesBtn;
-    private MaterialButton twentyMinutesBtn;
-    private Toolbar toolbar;
-    private AppCompatTextView chronometerView;
     private ReceiverAccessor receiverAccessor;
     private UISharedPreferences uiSharedPreferences;
     private ChronometerServiceAccessor chronometerServiceAccessor;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         setupReceiver();
         uiSharedPreferences = new UISharedPreferences(this);
@@ -85,8 +79,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupToolbar() {
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
     }
 
     @Override
@@ -125,29 +118,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupButtons() {
-        twentyMinutesBtn = findViewById(R.id.btn_twenty_min);
-        fifteenMinutesBtn = findViewById(R.id.btn_fifteen_min);
-        startStopBtn = findViewById(R.id.btn_start_stop);
-
+        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
+            setTwentyMinBtnChecked();
+        }
+        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
+            setFifteenMinBtnChecked();
+        }
         if (mainActivityViewModel.isChronometerRunning()) {
-            twentyMinutesBtn.setEnabled(false);
-            fifteenMinutesBtn.setEnabled(false);
-
-            if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
-                twentyMinutesBtn.setChecked(true);
-            }
-            else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
-                fifteenMinutesBtn.setChecked(true);
-            }
-
+            disableTimeButtons();
             setStartStopBtnToStop();
         } else {
+            enableTimeButtons();
             setStartStopBtnToStart();
         }
     }
 
+    private void setFifteenMinBtnChecked() {
+        binding.btnFifteenMin.setChecked(true);
+    }
+
+    private void setTwentyMinBtnChecked() {
+        binding.btnTwentyMin.setChecked(true);
+    }
+
     private void setupTwentyMinutesBtnAction() {
-        twentyMinutesBtn.setOnClickListener(v -> {
+        binding.btnTwentyMin.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
                 setChronometerToTwentyMinutes();
             }
@@ -155,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupFifteenMinutesBtnAction() {
-        fifteenMinutesBtn.setOnClickListener(v -> {
+        binding.btnFifteenMin.setOnClickListener(v -> {
             if (!mainActivityViewModel.isChronometerRunning()) {
                 setChronometerToFifteenMinutes();
             }
@@ -163,15 +158,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showTwentyMinutes() {
-        chronometerView.setText(getString(R.string.txt_twenty_minutes));
+        binding.chronometer.setText(getString(R.string.txt_twenty_minutes));
     }
 
     private void showFifteenMinutes() {
-        chronometerView.setText(getString(R.string.txt_fifteen_minutes));
+        binding.chronometer.setText(getString(R.string.txt_fifteen_minutes));
     }
 
     private void showTime(String time) {
-        chronometerView.setText(time);
+        binding.chronometer.setText(time);
     }
 
     private void setChronometerToFifteenMinutes() {
@@ -193,9 +188,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupChronometer() {
-        chronometerView = findViewById(R.id.chronometer);
-        setChronometerToTwentyMinutes();
-//        twentyMinutesBtn.setChecked(true);
+        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
+            setChronometerToTwentyMinutes();
+        }
+        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
+            setChronometerToFifteenMinutes();
+        }
     }
 
     private void saveCurrentChronometerTimeSet(boolean chronometerIsRunning, int howManyMinutes) {
@@ -204,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupStartStopBtnAction() {
-        startStopBtn.setOnClickListener(v -> {
+        binding.btnStartStop.setOnClickListener(v -> {
             if (mainActivityViewModel.isChronometerRunning()) {
                 stopChronometer();
             } else {
@@ -214,11 +212,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setStartStopBtnToStop() {
-        startStopBtn.setText(R.string.txt_btn_stop);
+        binding.btnStartStop.setText(R.string.txt_btn_stop);
     }
 
     private void setStartStopBtnToStart() {
-        startStopBtn.setText(R.string.txt_btn_start);
+        binding.btnStartStop.setText(R.string.txt_btn_start);
     }
 
     private void startChronometer() {
@@ -252,13 +250,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void enableTimeButtons() {
-        fifteenMinutesBtn.setEnabled(true);
-        twentyMinutesBtn.setEnabled(true);
+        binding.btnFifteenMin.setEnabled(true);
+        binding.btnTwentyMin.setEnabled(true);
     }
 
     private void disableTimeButtons() {
-        fifteenMinutesBtn.setEnabled(false);
-        twentyMinutesBtn.setEnabled(false);
+        binding.btnFifteenMin.setEnabled(false);
+        binding.btnTwentyMin.setEnabled(false);
     }
 
     private void setupReceiver() {
@@ -276,13 +274,14 @@ public class MainActivity extends AppCompatActivity {
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Action one tick test received");
                         showFinishPomodoroDialog();
+                        binding.btnTest.setEnabled(true);
                     }
                     break;
                 case ACTION_5_SEC_TEST_FINISH:
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Action 5 sec test received");
                         showFinishPomodoroDialog();
-                        findViewById(R.id.btn_test).setEnabled(true);
+                        binding.btnTest.setEnabled(true);
                     }
                     break;
                 default:
@@ -313,11 +312,11 @@ public class MainActivity extends AppCompatActivity {
 
     @VisibleForTesting
     private void showOneTickTestButton() {
-        Button testBtn = findViewById(R.id.btn_test);
-        testBtn.setText(R.string.txt_menu_item_one_tick_test);
-        testBtn.setVisibility(View.VISIBLE);
-        testBtn.setOnClickListener(v -> {
+        binding.btnTest.setText(R.string.txt_menu_item_one_tick_test);
+        binding.btnTest.setVisibility(View.VISIBLE);
+        binding.btnTest.setOnClickListener(v -> {
             Log.d(TAG, "Click on button test one tick");
+            v.setEnabled(false);
             setRunChronometerTrue();
             chronometerServiceAccessor.sendOneTick();
         });
@@ -325,21 +324,21 @@ public class MainActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public void show5SecTestButton() {
-        Button testBtn = findViewById(R.id.btn_test);
-        testBtn.setText(R.string.txt_menu_item_5_sec_test);
-        testBtn.setVisibility(View.VISIBLE);
-        testBtn.setOnClickListener(v -> {
+        binding.btnTest.setText(R.string.txt_menu_item_5_sec_test);
+        binding.btnTest.setVisibility(View.VISIBLE);
+        binding.btnTest.setOnClickListener(v -> {
             v.setEnabled(false);
             Log.d(TAG, "Click on button test 5 sec");
             setRunChronometerTrue();
+            setStartStopBtnToStop();
+            disableTimeButtons();
             chronometerServiceAccessor.start5secCount();
         });
     }
 
     @VisibleForTesting
     private void hideTestButton() {
-        Button testBtn = findViewById(R.id.btn_test);
-        testBtn.setVisibility(View.GONE);
+        binding.btnTest.setVisibility(View.GONE);
     }
 
     @VisibleForTesting
