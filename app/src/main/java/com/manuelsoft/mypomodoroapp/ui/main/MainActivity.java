@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private UISharedPreferences uiSharedPreferences;
     private ChronometerServiceAccessor chronometerServiceAccessor;
     private ActivityMainBinding binding;
+    private boolean isTesting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,8 +111,7 @@ public class MainActivity extends AppCompatActivity {
         else if (item.getItemId() == R.id.menu_item_5_sec) {
             show5SecTestButton();
         } else {
-            hideTestButton();
-            setupChronometer();
+            resetTest();
         }
 
         return super.onOptionsItemSelected(item);
@@ -205,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
         binding.btnStartStop.setOnClickListener(v -> {
             if (mainActivityViewModel.isChronometerRunning()) {
                 stopChronometer();
+                if (isTesting) {
+                    enableTestBtn();
+                }
             } else {
                 startChronometer();
             }
@@ -273,15 +276,13 @@ public class MainActivity extends AppCompatActivity {
                 case ACTION_ONE_TICK_TEST:
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Action one tick test received");
-                        showFinishPomodoroDialog();
-                        binding.btnTest.setEnabled(true);
+                        showFinishPomodoroTestDialog();
                     }
                     break;
                 case ACTION_5_SEC_TEST_FINISH:
                     if (BuildConfig.DEBUG) {
                         Log.d(TAG, "Action 5 sec test received");
-                        showFinishPomodoroDialog();
-                        binding.btnTest.setEnabled(true);
+                        showFinishPomodoroTestDialog();
                     }
                     break;
                 default:
@@ -299,6 +300,14 @@ public class MainActivity extends AppCompatActivity {
         setupChronometer();
     }
 
+    private void onFinishPomodoroTest() {
+        setRunChronometerFalse();
+        setStartStopBtnToStart();
+        enableTimeButtons();
+        setupChronometer();
+        enableTestBtn();
+    }
+
     private void showFinishPomodoroDialog() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle(R.string.txt_pomodoro_finished_dialog)
@@ -310,13 +319,25 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void showFinishPomodoroTestDialog() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.txt_pomodoro_finished_dialog)
+                .setPositiveButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
+                    dialog.dismiss();
+                    onFinishPomodoroTest();
+                })
+                .create()
+                .show();
+    }
+
     @VisibleForTesting
     private void showOneTickTestButton() {
+        isTesting = true;
         binding.btnTest.setText(R.string.txt_menu_item_one_tick_test);
         binding.btnTest.setVisibility(View.VISIBLE);
         binding.btnTest.setOnClickListener(v -> {
             Log.d(TAG, "Click on button test one tick");
-            v.setEnabled(false);
+            disableTestBtn();
             setRunChronometerTrue();
             chronometerServiceAccessor.sendOneTick();
         });
@@ -324,16 +345,32 @@ public class MainActivity extends AppCompatActivity {
 
     @VisibleForTesting
     public void show5SecTestButton() {
+        isTesting = true;
         binding.btnTest.setText(R.string.txt_menu_item_5_sec_test);
         binding.btnTest.setVisibility(View.VISIBLE);
         binding.btnTest.setOnClickListener(v -> {
-            v.setEnabled(false);
+            disableTestBtn();
             Log.d(TAG, "Click on button test 5 sec");
             setRunChronometerTrue();
             setStartStopBtnToStop();
             disableTimeButtons();
             chronometerServiceAccessor.start5secCount();
         });
+    }
+
+    private void enableTestBtn() {
+        binding.btnTest.setEnabled(true);
+    }
+
+    private void disableTestBtn() {
+        binding.btnTest.setEnabled(false);
+    }
+
+    @VisibleForTesting
+    private void resetTest() {
+        isTesting = false;
+        hideTestButton();
+        setupChronometer();
     }
 
     @VisibleForTesting
