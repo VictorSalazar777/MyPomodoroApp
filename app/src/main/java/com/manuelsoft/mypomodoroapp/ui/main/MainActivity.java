@@ -1,6 +1,5 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -8,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.VisibleForTesting;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -17,7 +17,8 @@ import com.manuelsoft.mypomodoroapp.R;
 import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 import com.manuelsoft.mypomodoroapp.databinding.ActivityMainBinding;
-import com.manuelsoft.mypomodoroapp.ui.credits.CreditsActivity;
+import com.manuelsoft.mypomodoroapp.databinding.DialogCreditsBinding;
+import com.manuelsoft.mypomodoroapp.databinding.DialogPomodoroFinishedBinding;
 
 import static android.view.Menu.NONE;
 import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.ACTION_5_SEC_TEST_FINISH;
@@ -102,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_item_credits) {
             Log.d(TAG, "Credits");
-            Intent intent = new Intent(this, CreditsActivity.class);
-            //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            showCreditsDialog();
         } else if (item.getItemId() == R.id.menu_item_one_tick_test) {
             showOneTickTestButton();
         }
@@ -115,6 +114,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showCreditsDialog() {
+        DialogCreditsBinding binding = DialogCreditsBinding.inflate(getLayoutInflater());
+
+        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+                .setView(binding.getRoot())
+                .create();
+
+        binding.btnDialogOk.setOnClickListener(v -> alertDialog.dismiss());
+
+        alertDialog.show();
     }
 
     private void setupButtons() {
@@ -310,8 +321,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void showFinishPomodoroDialog() {
         new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.txt_pomodoro_finished_dialog)
-                .setPositiveButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
+                .setTitle(R.string.txt_dialog_pomodoro_finished)
+                .setPositiveButton(R.string.txt_dialog_ok_btn, (dialog, which) -> {
                     dialog.dismiss();
                     onFinishPomodoro();
                 })
@@ -320,14 +331,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showFinishPomodoroTestDialog() {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.txt_pomodoro_finished_dialog)
-                .setPositiveButton(R.string.txt_btn_pomodoro_finished_dialog, (dialog, which) -> {
-                    dialog.dismiss();
-                    onFinishPomodoroTest();
-                })
-                .create()
-                .show();
+        DialogPomodoroFinishedBinding binding = DialogPomodoroFinishedBinding.inflate(getLayoutInflater());
+
+        AlertDialog alertDialog = new MaterialAlertDialogBuilder(this)
+                .setView(binding.getRoot())
+                .create();
+
+        binding.btnDialogOk.setOnClickListener(v -> {
+            alertDialog.dismiss();
+            onFinishPomodoroTest();
+        });
+
+        alertDialog.show();
     }
 
     @VisibleForTesting

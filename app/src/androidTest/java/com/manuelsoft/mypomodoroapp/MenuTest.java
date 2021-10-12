@@ -70,14 +70,14 @@ public class MenuTest {
         }
     }
 
-    @Test
-    public void clickCredits_showsCreditsActivity() {
-        if (BuildConfig.DEBUG) {
-            Intents.init();
-            onView(withText(R.string.txt_menu_item_credits)).perform(click());
-            intended(hasComponent(CreditsActivity.class.getName()));
-        }
-    }
+//    @Test
+//    public void clickCredits_showsCreditsActivity() {
+//        if (BuildConfig.DEBUG) {
+//            Intents.init();
+//            onView(withText(R.string.txt_menu_item_credits)).perform(click());
+//            intended(hasComponent(CreditsActivity.class.getName()));
+//        }
+//    }
 
     @Test
     public void clickOneTickTest_showsOneTickTestButton() {
