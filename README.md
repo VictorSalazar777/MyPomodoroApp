@@ -11,11 +11,16 @@ I used:
 * Audio.
 * TDD.
 * Mockito.
+* Espresso.
 * ViewModel (MVVM).
 * Activity.
 * Service.
 * Broadcast receiver.
 * Shared preferences.
 * Material components.
+* View binding.
+* Custom dialog.
 
 ![Alt text](../screenshots/mypomodoroapp1.png?raw=true "MyPomodoroApp screenshot")
+
+
