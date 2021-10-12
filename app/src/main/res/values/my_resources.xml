@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="menu_item_5_sec" type="id"/>
+    <item name="menu_item_one_tick_test" type="id"/>
+    <item name="menu_item_reset_tests" type="id"/>
+</resources>

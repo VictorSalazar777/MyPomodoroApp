@@ -9,7 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.MediumTest;
 import androidx.test.rule.ServiceTestRule;
 
-import com.manuelsoft.mypomodoroapp.chronometer.MyChronometerService;
+import com.manuelsoft.mypomodoroapp.chronometer.ChronometerService;
 import com.manuelsoft.mypomodoroapp.common.Utilities;
 
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class MyChronometerServiceTest {
 
     @Before
     public void setup() {
-        intent = new Intent(getApplicationContext(), MyChronometerService.class);
+        intent = new Intent(getApplicationContext(), ChronometerService.class);
     }
 
     @Test
@@ -42,7 +42,7 @@ public class MyChronometerServiceTest {
         getApplicationContext().startService(intent);
 
         IBinder binder = serviceTestRule.bindService(intent);
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        ChronometerService service = ((ChronometerService.ChronometerBinder) binder).getService();
 
         assertThat(service.isActive(), is(true));
     }
@@ -52,7 +52,7 @@ public class MyChronometerServiceTest {
         getApplicationContext().startService(intent);
         IBinder binder = serviceTestRule.bindService(intent);
 
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        ChronometerService service = ((ChronometerService.ChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
         Thread.sleep(100);
@@ -65,7 +65,7 @@ public class MyChronometerServiceTest {
         getApplicationContext().startService(intent);
         IBinder binder = serviceTestRule.bindService(intent);
 
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        ChronometerService service = ((ChronometerService.ChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
         Thread.sleep(100);
@@ -92,13 +92,13 @@ public class MyChronometerServiceTest {
         getApplicationContext().startService(intent);
         IBinder binder = serviceTestRule.bindService(intent);
 
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        ChronometerService service = ((ChronometerService.ChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
         Thread.sleep(100);
         service.stopChronometer();
 
-        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), MyChronometerService.class);
+        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), ChronometerService.class);
 
         assertThat(foreground, is(false));
     }
@@ -108,12 +108,12 @@ public class MyChronometerServiceTest {
         getApplicationContext().startService(intent);
         IBinder binder = serviceTestRule.bindService(intent);
 
-        MyChronometerService service = ((MyChronometerService.MyChronometerBinder) binder).getService();
+        ChronometerService service = ((ChronometerService.ChronometerBinder) binder).getService();
         service.setChronometer(20);
         service.startChronometer();
         Thread.sleep(100);
 
-        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), MyChronometerService.class);
+        boolean foreground = Utilities.isForegroundServiceRunning(getApplicationContext(), ChronometerService.class);
         service.stopChronometer();
 
         assertThat(foreground, is(true));

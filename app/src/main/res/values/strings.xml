@@ -6,11 +6,31 @@
     <string name="txt_btn_fifteen_minutes">15 min</string>
     <string name="txt_twenty_minutes">20:00</string>
     <string name="txt_fifteen_minutes">15:00</string>
-    <string name="txt_pomodoro_finished_dialog">Pomodoro finished!</string>
-    <string name="txt_btn_pomodoro_finished_dialog">Ok</string>
-    <string name="channel_name">Pomodoro</string>
-    <string name="channel_description">Pomodoro is running</string>
+    <string name="txt_channel_name">Pomodoro</string>
+    <string name="txt_channel_description">Pomodoro is running</string>
     <string name="txt_menu_item_credits">Credits</string>
-    <string name="txt_author_credits">Author: Manuel Salazar, using Android framework.</string>
-    <string name="txt_clock_sound_credits">Clock sound provided by: Pogotron, https://freesound.org/people/Pogotron/sounds/60811/ under license https://creativecommons.org/licenses/sampling+/1.0/</string>
+    <string name="txt_menu_item_5_sec_test">Test 5 seconds</string>
+    <string name="txt_menu_item_reset_tests">Reset tests</string>
+    <string name="txt_menu_item_one_tick_test">Test one tick</string>
+    <string name="txt_dialog_pomodoro_finished">Pomodoro finished!</string>
+    <string name="txt_dialog_ok_btn">OK</string>
+    <string name="txt_dialog_credits_title">Credits</string>
+    <string name="txt_dialog_credits_author">Author: Manuel Salazar</string>
+    <string name="txt_dialog_credits_features">
+        <ul>
+            <li>Android framework.</li>
+            <li>Java.</li>
+            <li>Audio.</li>
+            <li>TDD.</li>
+            <li>Mockito.</li>
+            <li>Espresso.</li>
+            <li>ViewModel (MVVM).</li>
+            <li>Activity.</li>
+            <li>Service.</li>
+            <li>Broadcast receiver.</li>
+            <li>Shared preferences.</li>
+            <li>Material components.</li>
+            <li>View binding.</li>
+        </ul>
+    </string>
 </resources>
