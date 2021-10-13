@@ -40,9 +40,8 @@ class NotificationHelper {
         return new NotificationCompat.Builder(context.getApplicationContext(), POMODORO_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)
                 .setColor(context.getResources().getColor(android.R.color.holo_green_light))
-                .setContentTitle("Pomodoro is running!")
-                .setContentText("text")
-                .setSubText("Pomodoro is running!")
+                .setContentTitle(context.getString(R.string.notification_title))
+                .setContentText(context.getString(R.string.notification_text))
                 //.setTicker() //TODO: Implement this for accessibility
                 .setContentIntent(getPendingIntent())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);

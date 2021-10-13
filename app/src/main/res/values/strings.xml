@@ -33,4 +33,6 @@
             <li>View binding.</li>
         </ul>
     </string>
+    <string name="notification_title">Pomodoro is running!</string>
+    <string name="notification_text">It\'s time to work</string>
 </resources>
