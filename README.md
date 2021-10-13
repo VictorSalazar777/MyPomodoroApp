@@ -21,6 +21,8 @@ I used:
 * View binding.
 * Custom dialog.
 
-![Alt text](../screenshots/mypomodoroapp1.png?raw=true "MyPomodoroApp screenshot")
+
+https://user-images.githubusercontent.com/35509355/137221441-6e5ee31f-7580-4ba5-9da6-0c38cdb580fe.mp4
+
 
 
