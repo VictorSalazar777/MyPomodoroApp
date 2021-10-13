@@ -18,7 +18,7 @@ import static com.manuelsoft.mypomodoroapp.chronometer.ChronometerService.POMODO
 
 class NotificationHelper {
 
-    private Context context;
+    private final Context context;
 
     NotificationHelper(Context context) {
         this.context = context;
@@ -38,7 +38,8 @@ class NotificationHelper {
 
     public NotificationCompat.Builder getNotificationBuilder() {
         return new NotificationCompat.Builder(context.getApplicationContext(), POMODORO_CHANNEL_ID)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setColor(context.getResources().getColor(android.R.color.holo_green_light))
                 .setContentTitle("Pomodoro is running!")
                 .setContentText("text")
                 .setSubText("Pomodoro is running!")
