@@ -1,7 +1,5 @@
 package com.manuelsoft.mypomodoroapp.ui.main;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -58,14 +56,21 @@ public class MainActivity extends AppCompatActivity {
         setupViewModel();
         setupChronometer();
         setupButtons();
-        setupStartStopBtnAction();
-        setupFifteenMinutesBtnAction();
-        setupTwentyMinutesBtnAction();
+        setupStartStopBtnListener();
+        setupFifteenMinutesBtnListener();
+        setupTwentyMinutesBtnListener();
+    }
+
+    private void setupToolbar() {
+        setSupportActionBar(binding.toolbar);
     }
 
     private void setupViewModel() {
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-//        mainActivityViewModel.runChronometer(
+    }
+
+    private void setupButtons() {
+        //        mainActivityViewModel.runChronometer(
 //                uiSharedPreferences.loadChronometerIsRunning()
 //                        && isChronometerServiceInTheForeground());
 //
@@ -74,16 +79,89 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            setChronometerToTwentyMinutes();
 //        }
+        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
+            setTwentyMinBtnChecked();
+        }
+        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
+            setFifteenMinBtnChecked();
+        }
+        if (mainActivityViewModel.isChronometerRunning()) {
+            disableTimeButtons();
+            setStartStopBtnToStop();
+        } else {
+            enableTimeButtons();
+            setStartStopBtnToStart();
+        }
+    }
+
+    private void setupChronometer() {
+        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
+            setChronometerToTwentyMinutes();
+        }
+        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
+            setChronometerToFifteenMinutes();
+        }
+    }
+
+    private void setChronometerToFifteenMinutes() {
+        setFifteenMinutes();
+        showFifteenMinutes();
+    }
+
+    private void setChronometerToTwentyMinutes() {
+        setTwentyMinutes();
+        showTwentyMinutes();
+    }
+
+    private void setFifteenMinutes() {
+        mainActivityViewModel.setFifteenMinutes();
+    }
+
+    private void setTwentyMinutes() {
+        mainActivityViewModel.setTwentyMinutes();
+    }
+
+    private void showTwentyMinutes() {
+        binding.chronometer.setText(getString(R.string.txt_twenty_minutes));
+    }
+
+    private void showFifteenMinutes() {
+        binding.chronometer.setText(getString(R.string.txt_fifteen_minutes));
+    }
+
+    private void setupStartStopBtnListener() {
+        binding.btnStartStop.setOnClickListener(v -> {
+            if (mainActivityViewModel.isChronometerRunning()) {
+                stopChronometer();
+                if (isTesting) {
+                    enableTestBtn();
+                }
+            } else {
+                startChronometer();
+            }
+        });
+    }
+
+    private void setupTwentyMinutesBtnListener() {
+        binding.btnTwentyMin.setOnClickListener(v -> {
+            if (!mainActivityViewModel.isChronometerRunning()) {
+                setChronometerToTwentyMinutes();
+            }
+        });
+    }
+
+    private void setupFifteenMinutesBtnListener() {
+        binding.btnFifteenMin.setOnClickListener(v -> {
+            if (!mainActivityViewModel.isChronometerRunning()) {
+                setChronometerToFifteenMinutes();
+            }
+        });
     }
 
     private boolean isChronometerServiceInTheForeground() {
         boolean result = Utilities.isForegroundServiceRunning(this, ChronometerService.class);
         Log.d(TAG, "isChronometerServiceInTheForeground(): " + result);
         return result;
-    }
-
-    private void setupToolbar() {
-        setSupportActionBar(binding.toolbar);
     }
 
     @Override
@@ -130,22 +208,6 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void setupButtons() {
-        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
-            setTwentyMinBtnChecked();
-        }
-        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
-            setFifteenMinBtnChecked();
-        }
-        if (mainActivityViewModel.isChronometerRunning()) {
-            disableTimeButtons();
-            setStartStopBtnToStop();
-        } else {
-            enableTimeButtons();
-            setStartStopBtnToStart();
-        }
-    }
-
     private void setFifteenMinBtnChecked() {
         binding.btnFifteenMin.setChecked(true);
     }
@@ -154,77 +216,13 @@ public class MainActivity extends AppCompatActivity {
         binding.btnTwentyMin.setChecked(true);
     }
 
-    private void setupTwentyMinutesBtnAction() {
-        binding.btnTwentyMin.setOnClickListener(v -> {
-            if (!mainActivityViewModel.isChronometerRunning()) {
-                setChronometerToTwentyMinutes();
-            }
-        });
-    }
-
-    private void setupFifteenMinutesBtnAction() {
-        binding.btnFifteenMin.setOnClickListener(v -> {
-            if (!mainActivityViewModel.isChronometerRunning()) {
-                setChronometerToFifteenMinutes();
-            }
-        });
-    }
-
-    private void showTwentyMinutes() {
-        binding.chronometer.setText(getString(R.string.txt_twenty_minutes));
-    }
-
-    private void showFifteenMinutes() {
-        binding.chronometer.setText(getString(R.string.txt_fifteen_minutes));
-    }
-
     private void showTime(String time) {
         binding.chronometer.setText(time);
-    }
-
-    private void setChronometerToFifteenMinutes() {
-        setFifteenMinutes();
-        showFifteenMinutes();
-    }
-
-    private void setChronometerToTwentyMinutes() {
-        setTwentyMinutes();
-        showTwentyMinutes();
-    }
-
-    private void setFifteenMinutes() {
-        mainActivityViewModel.setFifteenMinutes();
-    }
-
-    private void setTwentyMinutes() {
-        mainActivityViewModel.setTwentyMinutes();
-    }
-
-    private void setupChronometer() {
-        if (mainActivityViewModel.getHowManyMinutes() == TWENTY) {
-            setChronometerToTwentyMinutes();
-        }
-        else if (mainActivityViewModel.getHowManyMinutes() == FIFTEEN) {
-            setChronometerToFifteenMinutes();
-        }
     }
 
     private void saveCurrentChronometerTimeSet(boolean chronometerIsRunning, int howManyMinutes) {
         uiSharedPreferences
                 .saveChronometerState(chronometerIsRunning, howManyMinutes);
-    }
-
-    private void setupStartStopBtnAction() {
-        binding.btnStartStop.setOnClickListener(v -> {
-            if (mainActivityViewModel.isChronometerRunning()) {
-                stopChronometer();
-                if (isTesting) {
-                    enableTestBtn();
-                }
-            } else {
-                startChronometer();
-            }
-        });
     }
 
     private void setStartStopBtnToStop() {
